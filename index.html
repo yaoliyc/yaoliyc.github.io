@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-PDI转换教程" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/03/PDI转换教程/" class="article-date">
+  <time datetime="2018-12-03T06:49:05.000Z" itemprop="datePublished">2018-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/03/PDI转换教程/">PDI转换教程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="PDI转换教程"><a href="#PDI转换教程" class="headerlink" title="PDI转换教程"></a>PDI转换教程</h1><p>Spoon的数据集成透视图允许您创建两种基本文件类型：转换(Transformation)和作业(jobs)。Transformation用于描述ETL的数据流，例如从源读取，转换数据并将其加载到目标位置。jobs用于协调ETL活动，例如定义将要运行的转换的流程和依赖关系，或者通过检查诸如“源文件是否刻印”或“表已存在于数据库中”等条件来准备执行。</p>
+<p>本练习将引导您使用Pentaho Data Integration构建您的第一个转换，并在此过程中引入常见概念。练习场景包括销售数据的平面文件（.csv），您将加载到数据库中以便生成邮件列表。一些客户记录缺少在加载到数据库之前必须解决的邮政编码（邮政编码）。逻辑如下图所示：</p>
+<p><img src="http://pj5dfzmmy.bkt.clouddn.com/blog/20181203/ccPEHMcP308x.png?imageslim" alt="mark"></p>
+<h2 id="从平面文件中检索数据"><a href="#从平面文件中检索数据" class="headerlink" title="从平面文件中检索数据"></a>从平面文件中检索数据</h2><p>首先连接到存储库，然后按照以下说明从平面文件中检索数据。</p>
+<ol>
+<li>选择Spoon窗口 左上角的File&gt;  New&gt; Transformation以创建新转换。<br> <img src="http://pj5dfzmmy.bkt.clouddn.com/ssPDINewTransformation.png" alt="mark"></li>
+<li>在“ 设计”选项卡下，展开“ 输入”节点; 然后，选择文本文件输入步骤并将其拖动到画布上。</li>
+<li>双击文本文件输入步骤。该文本文件输入  窗口出现。此窗口允许您设置此步骤的属性。<br> <img src="http://pj5dfzmmy.bkt.clouddn.com/TextFileInput_File.png" alt="mark"></li>
+<li>在“ 步骤名称”字段中，键入“ 读取销售数据”。 这会将文本文件输入 步骤重命名  为“  读取销售数据”。</li>
+<li>单击“ 浏览”以找到源文件sales_data.csv，该文件位于…\design-tools\data-integration\samples\transformations\files。   （“ 浏览”按钮显示在窗口右上角靠近“  文件”或“目录” 字段的位置。）单击“ 打开”。源文件的路径显示在“ 文件”或“目录”字段中。</li>
+<li>单击添加。该文件的路径显示在“ 选定的文件”下。 </li>
+<li>要查看示例文件的内容，请执行以下步骤：<br>a.  单击“ 内容”选项卡，然后将“ 格式”字段设置  为  Unix。<br>b. 再次单击“ 文件”选项卡，然后单击窗口底部附近的“ 显示文件内容  ”。<br>c. 出现Nr个要查看的行 窗口。单击“  确定”按钮接受默认值。<br>d. 第一个文件窗口的内容显示该文件。检查文件以查看该输入文件的分隔方式，使用的机箱字符以及是否存在标题行。在示例中，输入文件是逗号（，）分隔符，外壳字符是引号（“），它包含一个包含字段名称的标题行。<br>e. 单击“  关闭” 按钮关闭窗口。</li>
+<li>要提供有关内容的信息，请执行以下步骤：<br>a. 单击“ 内容”选项卡。“ 内容”选项卡下的字段允许您定义数据的格式。<br>b. 确保将分隔符设置为逗号（，）并将机箱设置为引号（“）。启用标题，因为文件中有一行标题行。<br><img src="http://pj5dfzmmy.bkt.clouddn.com/textfileinput_content.png" alt="mark"><br>c.  单击“ 字段”选项卡，然后单击“ 获取字段”以从源文件中检索输入字段。当出现Nr of lines to sample窗口时，在字段中输入0，然后单击OK。<br>d. 如果显示“ 扫描结果”窗口，请单击“ 关闭”以关闭窗口。<br>e. 要验证数据是否正确读取：<br>   a.单击“ 内容”选项卡，然后单击“ 预览行”。<br>   b.在进入预览大小的窗口中点击  OK。出现“  检查预览数据” 窗口。<br>   c.查看数据，然后单击“  关闭”。<br>f. 单击“  确定” 以保存在步骤中输入的信息。<br>g. 要保存转换，请执行以下操作。<br>   a. 选择“ 文件”&gt;“保存”  以保存转换。<br>   b. 将出现“ 转换属性” 窗口。  在“  转换名称” 字段中，键入“  入门转换”。（请注意，将显示“  转换属性” 窗口，因为您已连接到存储库。如果未连接到存储库，则会显示标准保存窗口。）<br>   <img src="http://pj5dfzmmy.bkt.clouddn.com/TransformationProperties.png" alt="mark"><br>   c. 在“  目录” 字段中，单击文件夹图标。<br>   d. 展开  主 目录，然后双击要保存转换的文件夹。您的转换将保存在Pentaho存储库中。<br>   e.单击“  确定” 关闭“  转换属性” 窗口。</li>
+</ol>
+<h2 id="使用丢失的邮政编码过滤记录"><a href="#使用丢失的邮政编码过滤记录" class="headerlink" title="使用丢失的邮政编码过滤记录"></a>使用丢失的邮政编码过滤记录</h2><p>完成<a href="https://help.pentaho.com/Documentation/7.1/0J0/0C0/020#Retrieving_Data_from_a_Flat_File" target="_blank" rel="noopener">从平面文件中检索数据</a>后，您就可以为转换添加下一步了。源文件包含几个缺少邮政编码的记录。使用“过滤行”转换步骤将这些记录分开，以便您可以在以后的练习中解决这些记录。</p>
+<ol>
+<li>在转换中添加“ <strong>过滤行”</strong>步骤。在“ <strong>设计”</strong>选项卡下，选择“  <strong>流”</strong> &gt;“ <strong>过滤行”</strong>。</li>
+<li>在“ <strong>读取销售数据”</strong>  步骤和“ <strong>筛选行”</strong>步骤之间创建一个跃点。啤酒花用于描述转换中的数据流。要创建跃点，请单击“ <strong>读取销售数据</strong>（文本文件输入）”步骤，然后按&lt; <strong>SHIFT</strong> &gt;键并在“ <strong>过滤行”</strong>步骤中绘制一条线。</li>
+</ol>
+<p><img src="/Users/yaoli/hexo/source/_posts/img/readsalesdata_filterrows.png" alt="readsalesdata_filterrows"></p>
+<ol start="3">
+<li><p>双击“ <strong>筛选行”</strong>步骤。将出现“ <strong>过滤行”</strong>窗口。</p>
+</li>
+<li><p>在“ <strong>步骤名称”</strong>字段中，“ <strong>筛选丢失的拉链”</strong>。</p>
+</li>
+<li><p>在<strong>“条件”下</strong>，单击“ <field>”。将 出现“ <strong>字段”</strong>窗口。这些是您可以选择的条件。</field></p>
+</li>
+<li><p>在“ <strong>字段”</strong>  窗口中，选择<strong>POSTALCODE</strong>，然后单击“ <strong>确定”</strong>。</p>
+</li>
+<li><p>单击比较运算符（默认设置为<strong>=</strong>），然后 从出现的<strong>Functions：</strong> 窗口中选择<strong>IS NOT NULL</strong>。</p>
+</li>
+<li><p>单击“ <strong>确定”</strong>关闭“ <strong>功能：”</strong> 窗口。</p>
+</li>
+<li><p>单击“  <strong>确定”</strong>退出“ <strong>筛选行”</strong>窗口。</p>
+<p>注意：稍后将返回此步骤，并在将目标步骤添加到转换后将“将<strong>数据发送**</strong>到步骤”<strong>和“ </strong>将错误数据发送到步骤**设置”进行配置。</p>
+</li>
+<li><p>选择“ <strong>文件”&gt;“保存”</strong> 以保存转换。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/03/PDI转换教程/" data-id="cjpb5m3bq0000p1ue4zqdzbcy" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/03/PDI转换教程/">PDI转换教程</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
