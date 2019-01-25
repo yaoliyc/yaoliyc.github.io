@@ -29,7 +29,7 @@
     <!--Title-->
 
 
-<title>利用github pages搭建自己的博客 | 屹的小世界</title>
+<title>为github pages自定义域名 | 屹的小世界</title>
 
 
     <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
@@ -146,9 +146,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="利用github pages搭建自己的博客">
+        <h1 id="为github pages自定义域名">
             
-	            利用github pages搭建自己的博客
+	            为github pages自定义域名
             
         </h1>
         <div class="post-meta">
@@ -168,6 +168,14 @@
         <span class="tags-meta">
             
                 
+                    <a href="/tags/自定义域名" title="自定义域名">
+                        自定义域名
+                    </a>
+                
+                    <a href="/tags/github pages" title="github pages">
+                        github pages
+                    </a>
+                
             
         </span>
     </span>
@@ -177,7 +185,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2018/12/08</span>
+            <span class="date-meta">2018/12/18</span>
         </span>
         
     
@@ -188,25 +196,19 @@
     </div>
     
     <div class="post-body post-content">
-        <h1 id="利用github-pages服务搭建自己的博客"><a href="#利用github-pages服务搭建自己的博客" class="headerlink" title="利用github pages服务搭建自己的博客"></a>利用github pages服务搭建自己的博客</h1><p>GitHub Pages是一种<a href="https://zh.wikipedia.org/zh-hans/GitHub" target="_blank" rel="noopener">Github</a>静态站点托管服务，旨在直接从GitHub存储库托管您的个人，组织或项目页面。利用它我们可以不需要自己的主机便可以有一个所有人都可以访问的博客。</p>
-<h2 id="在github上创建项目"><a href="#在github上创建项目" class="headerlink" title="在github上创建项目"></a>在github上创建项目</h2><p>在github上创建一个repository，名称为username.github.io，其中username是用户在github上使用的用户名。我这里是yaoliyc。</p>
-<img src="/2018/12/08/搭建博客/图1.png">
-<h2 id="利用hexo搭建博客框架"><a href="#利用hexo搭建博客框架" class="headerlink" title="利用hexo搭建博客框架"></a>利用hexo搭建博客框架</h2><p>这里介绍一个名为<a href="https://hexo.io/zh-cn/docs/index.html" target="_blank" rel="noopener">hexo</a>的博客框架，借助它，我们只需要专注于用Markdown写文章而不需要过多关心如何让博客有让人满意的显示效果。hexo是基于nodejs开发，git是目前非常流行的代码版本管理工具，安装了上诉两个必备程序，接下来只需要使用 npm 即可完成 Hexo 的安装。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
-<p>安装 Hexo 完成后，请执行下列命令，Hexo 将会在指定文件夹中新建所需要的文件。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init &lt;folder&gt;</span><br><span class="line"><span class="built_in">cd</span> &lt;folder&gt;</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure></p>
-<p>此时博客框架文件就建好了。<br>  <img src="/2018/12/08/搭建博客/图2.png"><br>  图中的hello-world.md便是我们写文章的文件，执行以下命令并用浏览器打开<a href="http://localhost:4000预览文章" target="_blank" rel="noopener">http://localhost:4000预览文章</a></p>
-  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo s -p 4000</span><br></pre></td></tr></table></figure>
-<p>形如：</p>
-  <img src="/2018/12/08/搭建博客/图3.png">
-<h2 id="将博客发布到github上"><a href="#将博客发布到github上" class="headerlink" title="将博客发布到github上"></a>将博客发布到github上</h2><p>此时我们需要将博客部署到github上</p>
-<p>打开根目录<folder>下_config.yml配置文件，向下找到delpoy配置项<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line"> type:</span><br></pre></td></tr></table></figure></folder></p>
-<p>修改成：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/yaoliyc/yaoliyc.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p>这里的地址就是我们第一步创建的repository的地址，执行以下命令将博客发布到github上</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br></pre></td></tr></table></figure>
-<p>执行过程中可能会要求输入github的用户名和密码，按要求输入。看到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INFO  Deploy done: git</span><br></pre></td></tr></table></figure></p>
-<p> 表示部署完成，此时通过浏览器访问username.github.io即可看到我们的第一篇博客文章了。</p>
-<p>关于hexo更多的用法配置可以参照<a href="https://hexo.io/zh-cn/docs/index.html" target="_blank" rel="noopener">hexo</a>做进一步的了解。</p>
+        <h1 id="为利用github-pages服务搭建的博客添加自定义域名"><a href="#为利用github-pages服务搭建的博客添加自定义域名" class="headerlink" title="为利用github pages服务搭建的博客添加自定义域名"></a>为利用github pages服务搭建的博客添加自定义域名</h1><p>在前一篇博文中介绍了利用gihub pages服务大建博客，本篇博文介绍如何为博客添加自定义域名。关于DNS有A记录，CNAME别名，本次仅介绍CNAME别名</p>
+<h2 id="设置自定义域名"><a href="#设置自定义域名" class="headerlink" title="设置自定义域名"></a>设置自定义域名</h2><p>为Github Pages网站设置自定义域名，这里我使用<a href="http://www.freenom.world/zh/index.html?lang=zh" target="_blank" rel="noopener">freenom</a>提供的免费域名（<strong>tiandu.ga</strong>）。我们需要选择一个自定义域名并在DNS服务提供商那里注册，并将自定义域名解析到位于Github上的Github Pages网址,这里我使用<a href="https://dash.cloudflare.com" target="_blank" rel="noopener">cloudflare</a>提供的域名解析及CDN加速服务。Github Pages支持顶级域名和子域名。</p>
+<h2 id="设置一个www子域名"><a href="#设置一个www子域名" class="headerlink" title="设置一个www子域名"></a>设置一个www子域名</h2><p>要设置形如<a href="http://www.tiandu.ga的www子域名，需要在DNS服务提供商那里设置一条CNAME记录。" target="_blank" rel="noopener">www.tiandu.ga的www子域名，需要在DNS服务提供商那里设置一条CNAME记录。</a></p>
+<h2 id="设置一条CNAME记录"><a href="#设置一条CNAME记录" class="headerlink" title="设置一条CNAME记录"></a>设置一条CNAME记录</h2><p>进入DNS设置界面</p>
+<img src="/2018/12/18/自定义域名/图一.png">
+<p>添加一条CNAME记录，CNAME记录可以简单理解为一个域名的别名，Github Page本提供了一个yaoliyc.github.io的域名，这里利用CNAME记录，相当于用自定义域名作为yaoliyc.github.io别名，这样访问自定义域名即可以访问Github Pages服务。</p>
+<img src="/2018/12/18/自定义域名/图二.png">
+<h2 id="在Github-Pages中设置自定域名"><a href="#在Github-Pages中设置自定域名" class="headerlink" title="在Github Pages中设置自定域名"></a>在Github Pages中设置自定域名</h2><p>访问github.io资源库，进入设置界面</p>
+<img src="/2018/12/18/自定义域名/图三.png">
+<p>向下滑动直到GitHub Pages段落</p>
+<img src="/2018/12/18/自定义域名/图四.png">
+<p>这是自定义域名<a href="http://www.tianfu.ga,点击保存。通过浏览器访问博客。" target="_blank" rel="noopener">www.tianfu.ga,点击保存。通过浏览器访问博客。</a></p>
+<p>完</p>
 
     </div>
     
@@ -244,15 +246,15 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2018/12/18/自定义域名/" class="pre-post btn btn-default" title="为github pages自定义域名">
+        <a href="/2018/12/23/Spring-boot-docker化/" class="pre-post btn btn-default" title="Spring boot Docker化">
             <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">为github pages自定义域名</span>
+            <span class="hidden-xs">Spring boot Docker化</span>
         </a>
     
     
-        <a href="/2018/12/07/hexo主题设置/" class="next-post btn btn-default" title="hexo主题设置">
+        <a href="/2018/12/08/搭建博客/" class="next-post btn btn-default" title="利用github pages搭建自己的博客">
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">hexo主题设置</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">利用github pages搭建自己的博客</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -274,7 +276,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#利用github-pages服务搭建自己的博客"><span class="toc-text">利用github pages服务搭建自己的博客</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#在github上创建项目"><span class="toc-text">在github上创建项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#利用hexo搭建博客框架"><span class="toc-text">利用hexo搭建博客框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#将博客发布到github上"><span class="toc-text">将博客发布到github上</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#为利用github-pages服务搭建的博客添加自定义域名"><span class="toc-text">为利用github pages服务搭建的博客添加自定义域名</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#设置自定义域名"><span class="toc-text">设置自定义域名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置一个www子域名"><span class="toc-text">设置一个www子域名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置一条CNAME记录"><span class="toc-text">设置一条CNAME记录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在Github-Pages中设置自定域名"><span class="toc-text">在Github Pages中设置自定域名</span></a></li></ol></li></ol>
         
     </div>
 </aside>
