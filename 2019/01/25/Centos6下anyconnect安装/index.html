@@ -1,0 +1,317 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="屹的小世界">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="http://yaoliyc.github.io">
+    <!--SEO-->
+
+<meta name="description" content="博客">
+
+
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+    <!--Title-->
+
+
+<title>Centos6下anyconnect安装 | 屹的小世界</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-9733427950027098",
+        enable_page_level_ads: true
+      });
+    </script>
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header" style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)">
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title="屹">
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yaoliyc.github.io">屹的小世界</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Centos6下anyconnect安装">
+            
+	            Centos6下anyconnect安装
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/ ">
+             
+        </a>
+    </span>
+    
+
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/笔记" title="笔记">
+                        笔记
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/01/25</span>
+        </span>
+        
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <p>本文记录在Centos6上安装openconnect(思科any connect的第三方客户端)<br>使用以下命令安装包含openconnect的源<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm</span><br></pre></td></tr></table></figure></p>
+<p>执行以下命令安装openconnect<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y openconnect</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后执行openconnect，看到参数提示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">[kissshot@centos-dev-59 ~]$  sudo openconnect</span><br><span class="line">[sudo] password for kissshot: </span><br><span class="line">No server specified</span><br><span class="line">Usage:  openconnect [options] &lt;server&gt;</span><br><span class="line">Open client for Cisco AnyConnect VPN, version v7.06-1.el7</span><br><span class="line"></span><br><span class="line">Using GnuTLS. Features present: TPM, PKCS#11, RSA software token, HOTP software token, TOTP software token, Yubikey OATH, DTLS</span><br><span class="line">      --config=CONFIGFILE         Read options from config file</span><br><span class="line">  -b, --background                Continue in background after startup</span><br><span class="line">      --pid-file=PIDFILE          Write the daemon&apos;s PID to this file</span><br><span class="line">  -c, --certificate=CERT          Use SSL client certificate CERT</span><br><span class="line">  -e, --cert-expire-warning=DAYS  Warn when certificate lifetime &lt; DAYS</span><br><span class="line">  -k, --sslkey=KEY                Use SSL private key file KEY</span><br><span class="line">  -C, --cookie=COOKIE             Use WebVPN cookie COOKIE</span><br><span class="line">      --cookie-on-stdin           Read cookie from standard input</span><br><span class="line">  -d, --deflate                   启用压缩(默认;)</span><br><span class="line">  -D, --no-deflate                禁用压缩</span><br><span class="line">      --force-dpd=INTERVAL        Set minimum Dead Peer Detection interval</span><br><span class="line">  -g, --usergroup=GROUP           设置登录的用户组</span><br><span class="line">  -h, --help                      显示帮助文本</span><br><span class="line">  -i, --interface=IFNAME          Use IFNAME for tunnel interface</span><br><span class="line">  -l, --syslog                    Use syslog for progress messages</span><br><span class="line">      --timestamp                 Prepend timestamp to progress messages</span><br><span class="line">  -U, --setuid=USER               Drop privileges after connecting</span><br><span class="line">      --csd-user=USER             Drop privileges during CSD execution</span><br><span class="line">      --csd-wrapper=SCRIPT        Run SCRIPT instead of CSD binary</span><br><span class="line">  -m, --mtu=MTU                   Request MTU from server</span><br><span class="line">      --base-mtu=MTU              Indicate path MTU to/from server</span><br><span class="line">  -p, --key-password=PASS         Set key passphrase or TPM SRK PIN</span><br><span class="line">      --key-password-from-fsid    Key passphrase is fsid of file system</span><br><span class="line">  -P, --proxy=URL                 设置代理服务器</span><br><span class="line">      --proxy-auth=METHODS        Set proxy authentication methods</span><br><span class="line">      --no-proxy                  禁用代理</span><br><span class="line">      --libproxy                  Use libproxy to automatically configure proxy</span><br><span class="line">      --pfs                       Require perfect forward secrecy</span><br><span class="line">  -q, --quiet                     简化输出</span><br><span class="line">  -Q, --queue-len=LEN             Set packet queue limit to LEN pkts</span><br><span class="line">  -s, --script=SCRIPT             Shell command line for using a vpnc-compatible config script</span><br><span class="line">                                  default: &quot;/etc/vpnc/vpnc-script&quot;</span><br><span class="line">  -S, --script-tun                Pass traffic to &apos;script&apos; program, not tun</span><br><span class="line">  -u, --user=NAME                 设置登录用户名</span><br><span class="line">  -V, --version                   报告版本号</span><br><span class="line">  -v, --verbose                   更多输出</span><br><span class="line">      --dump-http-traffic         Dump HTTP authentication traffic (implies --verbose</span><br><span class="line">  -x, --xmlconfig=CONFIG          XML 配置文件</span><br><span class="line">      --authgroup=GROUP           Choose authentication login selection</span><br><span class="line">      --authenticate              Authenticate only and print login info</span><br><span class="line">      --cookieonly                Fetch webvpn cookie only; don&apos;t connect</span><br><span class="line">      --printcookie               Print webvpn cookie before connecting</span><br><span class="line">      --cafile=FILE               Cert file for server verification</span><br><span class="line">      --disable-ipv6              Do not ask for IPv6 connectivity</span><br><span class="line">      --dtls-ciphers=LIST         OpenSSL ciphers to support for DTLS</span><br><span class="line">      --no-dtls                   Disable DTLS</span><br><span class="line">      --no-http-keepalive         Disable HTTP connection re-use</span><br><span class="line">      --no-passwd                 Disable password/SecurID authentication</span><br><span class="line">      --no-cert-check             Do not require server SSL cert to be valid</span><br><span class="line">      --no-system-trust           Disable default system certificate authorities</span><br><span class="line">      --no-xmlpost                Do not attempt XML POST authentication</span><br><span class="line">      --non-inter                 Do not expect user input; exit if it is required</span><br><span class="line">      --passwd-on-stdin           Read password from standard input</span><br><span class="line">      --token-mode=MODE           Software token type: rsa, totp or hotp</span><br><span class="line">      --token-secret=STRING       Software token secret</span><br><span class="line">      --reconnect-timeout         Connection retry timeout in seconds</span><br><span class="line">      --servercert=FINGERPRINT    Server&apos;s certificate SHA1 fingerprint</span><br><span class="line">      --useragent=STRING          HTTP header User-Agent: field</span><br><span class="line">      --os=STRING                 OS type (linux,linux-64,win,...) to report</span><br><span class="line">      --dtls-local-port=PORT      Set local port for DTLS datagrams</span><br></pre></td></tr></table></figure></p>
+<p>执行以下命令连接VPN<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo echo &quot;密码&quot; |  openconnect -v -u 用户名 --authgroup 用户组 --no-cert-check --script=/etc/vpnc/vpnc-script --no-dtls 服务器IP[:端口]</span><br></pre></td></tr></table></figure></p>
+<p>以上安装完成，正常情况下边可使用，以后再研究如何开启自启作为服务使用。</p>
+
+    </div>
+    
+        <div class="reward">
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+                <span class="reward-type">
+                    <img class="alipay" src="https://res.cloudinary.com/dtb5wf4uh/image/upload/v1544161717/alipay.jpg"><b>支付宝打赏</b>
+                </span>
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="https://res.cloudinary.com/dtb5wf4uh/image/upload/v1544161717/wechatpay.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赞赏是不耍流氓的鼓励</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2018/12/08/搭建博客/" class="next-post btn btn-default" title="利用github pages搭建自己的博客">
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">利用github pages搭建自己的博客</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+   <p>评论系统未开启，无法评论！</p>
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <p>暂无目录</p>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
