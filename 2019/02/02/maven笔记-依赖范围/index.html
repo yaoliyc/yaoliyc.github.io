@@ -196,7 +196,7 @@
     </div>
     
     <div class="post-body post-content">
-        <h2 id="依赖范围"><a href="#依赖范围" class="headerlink" title="依赖范围"></a>依赖范围</h2><p>​    依赖范围用来控制依赖于三种classpath(编译classpath、测试classpath、运行classpath)的关系，Maven有一下集中依赖范围：</p>
+        <h1 id="依赖范围"><a href="#依赖范围" class="headerlink" title="依赖范围"></a>依赖范围</h1><p>​    依赖范围用来控制依赖于三种classpath(编译classpath、测试classpath、运行classpath)的关系，Maven有一下集中依赖范围：</p>
 <ul>
 <li>compile：编译依赖范围。默认值</li>
 <li>test：测试依赖范围。典型Junit</li>
@@ -295,14 +295,13 @@
 </tr>
 </tbody>
 </table>
-<p>依赖调解</p>
-<ul>
+<h2 id="依赖调解"><a href="#依赖调解" class="headerlink" title="依赖调解"></a>依赖调解</h2><ul>
 <li>第一原则：路径最近者优先</li>
 <li>第二原则：第一声明者优先</li>
 </ul>
-<p>可选依赖</p>
+<p>##可选依赖</p>
 <p>​    可选依赖将不会传递</p>
-<p>最佳实践</p>
+<p>##最佳实践</p>
 <ol>
 <li><p>排除依赖</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.juven.mvnbook<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.juven.mvnbook<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project-c<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -394,7 +393,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#依赖范围"><span class="toc-text">依赖范围</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#依赖范围"><span class="toc-text">依赖范围</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#依赖调解"><span class="toc-text">依赖调解</span></a></li></ol></li></ol>
         
     </div>
 </aside>
