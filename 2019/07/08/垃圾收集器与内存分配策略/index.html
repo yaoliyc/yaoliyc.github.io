@@ -224,6 +224,32 @@
 <li>加载该类的ClassLoader已经被回收</li>
 <li>改类对应的java.lang.Class对象没有在任何地方被引用，无法再任何地方通过反射方位改类的方法。</li>
 </ul>
+<h1 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h1><ul>
+<li>标记-清除算法</li>
+<li>复制算法</li>
+<li>标记-整理算法</li>
+</ul>
+<h1 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h1><ul>
+<li>Serial收集器</li>
+<li>ParNew收集器</li>
+<li>Parallel Scavenge收集器</li>
+<li>Serial Old收集器</li>
+<li>CMS收集器</li>
+<li>G1收集器</li>
+</ul>
+<h1 id="内存分配与回收策略"><a href="#内存分配与回收策略" class="headerlink" title="内存分配与回收策略"></a>内存分配与回收策略</h1><ul>
+<li><p>对象有限在Eden分配</p>
+<ul>
+<li>新生代GC(Minor GC):指发生在新生代的垃圾收集动作</li>
+<li>老年代GC(Major GC/ Full GC):指发生在老年代的GC，出现了Major GC,经常会伴随至少一次的Minor GC。Major GC的速度一般会比Minor GC慢10倍以上。</li>
+</ul>
+</li>
+<li><p>大对象直接进入老年代</p>
+</li>
+<li>长期存活的对象将进入老年代</li>
+<li>动态对象年龄判定</li>
+<li>空间分配担保</li>
+</ul>
 
     </div>
     
@@ -286,7 +312,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#如何判断对象已死"><span class="toc-text">如何判断对象已死</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#引用计数算法"><span class="toc-text">引用计数算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#可达性分析"><span class="toc-text">可达性分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#再谈引用"><span class="toc-text">再谈引用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回收方法区"><span class="toc-text">回收方法区</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#概述"><span class="toc-text">概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#如何判断对象已死"><span class="toc-text">如何判断对象已死</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#引用计数算法"><span class="toc-text">引用计数算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#可达性分析"><span class="toc-text">可达性分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#再谈引用"><span class="toc-text">再谈引用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回收方法区"><span class="toc-text">回收方法区</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#垃圾收集算法"><span class="toc-text">垃圾收集算法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#垃圾收集器"><span class="toc-text">垃圾收集器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#内存分配与回收策略"><span class="toc-text">内存分配与回收策略</span></a></li></ol>
         
     </div>
 </aside>
