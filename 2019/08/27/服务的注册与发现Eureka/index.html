@@ -1,0 +1,361 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="屹的小世界">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <link rel="dns-prefetch" href="http://yaoliyc.github.io">
+    <!--SEO-->
+
+<meta name="description" content="博客">
+
+
+
+
+
+<meta name="robots" content="all">
+<meta name="google" content="all">
+<meta name="googlebot" content="all">
+<meta name="verify" content="all">
+    <!--Title-->
+
+
+<title>服务的注册与发现Eureka | 屹的小世界</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-9733427950027098",
+        enable_page_level_ads: true
+      });
+    </script>
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-131336606-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-131336606-1');
+</script>
+
+
+
+    
+
+</head>
+
+</html>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header" style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)">
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title="屹">
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yaoliyc.github.io">屹的小世界</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>首页</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="服务的注册与发现Eureka">
+            
+	            服务的注册与发现Eureka
+            
+        </h1>
+        <div class="post-meta">
+    
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a href="/categories/后端">
+            后端
+        </a>
+    </span>
+    
+
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+                
+                    <a href="/tags/笔记" title="笔记">
+                        笔记
+                    </a>
+                
+                    <a href="/tags/java" title="java">
+                        java
+                    </a>
+                
+                    <a href="/tags/spring cloud" title="spring cloud">
+                        spring cloud
+                    </a>
+                
+            
+        </span>
+    </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/27</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h3 id="服务发现：Eureka-Server"><a href="#服务发现：Eureka-Server" class="headerlink" title="服务发现：Eureka Server"></a>服务发现：Eureka Server</h3><h4 id="如何引入Eureka-Server"><a href="#如何引入Eureka-Server" class="headerlink" title="如何引入Eureka Server"></a>如何引入Eureka Server</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>对于使用Thymeleaf模板引擎的已有项目，Eureka Server中的Freemarker模板可能无法正确加载。此时需要手动配置模板加载器。</p>
+<p><strong>application.yml.</strong> </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  freemarker:</span></span><br><span class="line"><span class="attr">    template-loader-path:</span> <span class="attr">classpath:/templates/</span></span><br><span class="line"><span class="attr">    prefer-file-system-access:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h4 id="如何运行Eureka-Server"><a href="#如何运行Eureka-Server" class="headerlink" title="如何运行Eureka Server"></a>如何运行Eureka Server</h4><p>示例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableEurekaServer</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> SpringApplicationBuilder(Application.class).web(<span class="keyword">true</span>).run(args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该服务有一个主页，HTTP API在<code>/eureka/*</code>路径下。</p>
+<h4 id="High-Availability-Zones-and-Regions"><a href="#High-Availability-Zones-and-Regions" class="headerlink" title="High Availability, Zones and Regions"></a>High Availability, Zones and Regions</h4><p>Eureka server没有后端存储，所有注册的服务示例必须发送心跳保存注册信息的更新。客户端也在内存中保存Eureka注册信息。</p>
+<p>默认情况下，每个Eureka服务端同时也是一个客户端需要一个地址来注册。如果不提供，服务也可以正常运行但日志中会有许多提示无法注册。</p>
+<h4 id="独立模式"><a href="#独立模式" class="headerlink" title="独立模式"></a>独立模式</h4><p>两个缓存（客户端和服务器）和心跳的组合使得独立的Eureka服务器能够非常适应故障，只要有某种监视器或弹性运行时（例如Cloud Foundry）使其保持活动状态。在独立模式下，您可能更愿意关闭客户端行为，以便它不会继续尝试并且无法访问其对等方。以下示例显示如何关闭客户端行为：</p>
+<p><strong>application.yml (Standalone Eureka Server).</strong> </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">8761</span></span><br><span class="line"></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    registerWithEureka:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">    fetchRegistry:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">    serviceUrl:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="attr">http://$&#123;eureka.instance.hostname&#125;:$&#123;server.port&#125;/eureka/</span></span><br></pre></td></tr></table></figure>
+<p><code>serviceUrl</code>设置为本地实例同样的主机。</p>
+<h2 id="Peer-Awareness"><a href="#Peer-Awareness" class="headerlink" title="Peer Awareness"></a>Peer Awareness</h2><p>Eureka可以通过运行多个实例并要求它们相互注册，可以使Eureka更具弹性和可用性</p>
+<p><strong>application.yml (Two Peer Aware Eureka Servers).</strong> </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span> <span class="string">peer1</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">peer1</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    serviceUrl:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="attr">http://peer2/eureka/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span> <span class="string">peer2</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">peer2</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    serviceUrl:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="attr">http://peer1/eureka/</span></span><br></pre></td></tr></table></figure>
+<p>上述示例中，我们在两个hosts上运行同样的服务中不同的Spring profiles。可以在单个主机上通过配置<code>/etc/hosts</code>解析这些主机名来测试peer awareness。事实上<code>eureka.instance.hostname</code>不是必须的，默认通过<code>java.net.InetAddress</code>来获取。</p>
+<p>可以将多个对Peer添加到系统中，并且只要它们通过至少一个edge彼此连接，它们就会在它们之间同步注册。如果Peer在物理上是分开的（在数据中心内或在多个数据中心之间），那么系统原则上可以存在“split-brain”类型的故障。您可以向系统添加多个对等体，只要它们彼此直接连接，它们就会在它们之间同步注册。</p>
+<p><strong>application.yml (Three Peer Aware Eureka Servers).</strong> </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  client:</span></span><br><span class="line"><span class="attr">    serviceUrl:</span></span><br><span class="line"><span class="attr">      defaultZone:</span> <span class="attr">http://peer1/eureka/,http://peer2/eureka/,http://peer3/eureka/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span> <span class="string">peer1</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">peer1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span> <span class="string">peer2</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">peer2</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span> <span class="string">peer3</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line"><span class="attr">  instance:</span></span><br><span class="line"><span class="attr">    hostname:</span> <span class="string">peer3</span></span><br></pre></td></tr></table></figure>
+<h2 id="When-to-Prefer-IP-Address"><a href="#When-to-Prefer-IP-Address" class="headerlink" title="When to Prefer IP Address"></a>When to Prefer IP Address</h2><p>在某些时候，Eureka对服务发布IP地址而不是主机名。设置<code>eureka.instance.preferIpAddress</code>为<code>true</code>,应用使用IP地址而不是主机名想Eureka注册。</p>
+<h2 id="Securing-The-Eureka-Server"><a href="#Securing-The-Eureka-Server" class="headerlink" title="Securing The Eureka Server"></a>Securing The Eureka Server</h2><p>可以通过添加<code>spring-boot-starter-security</code>为Eureka服务提供安全防护。默认情况，当classpath中出现Spring Security时将要求每次向应用程序发出请求时都会发送一个有效的CSRF令牌。Eureka客户端通常不会拥有有效的跨站点请求伪造（CSRF）令牌，您需要为<code>/ eureka / **</code>端点禁用此要求。示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableWebSecurity</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WebSecurityConfig</span> <span class="keyword">extends</span> <span class="title">WebSecurityConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        http.csrf().ignoringAntMatchers(<span class="string">"/eureka/**"</span>);</span><br><span class="line">        <span class="keyword">super</span>.configure(http);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="JDK-11-支持"><a href="#JDK-11-支持" class="headerlink" title="JDK 11 支持"></a>JDK 11 支持</h2><p>Eureka服务端依赖的JAXB模块在JDK 11中奖杯移除，使用JDK 11运行Eureka服务需引入依赖。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.glassfish.jaxb<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jaxb-runtime<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+    
+        <div class="reward">
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+                <span class="reward-type">
+                    <img class="alipay" src="https://res.cloudinary.com/dtb5wf4uh/image/upload/v1544161717/alipay.jpg"><b>支付宝打赏</b>
+                </span>
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="https://res.cloudinary.com/dtb5wf4uh/image/upload/v1544161717/wechatpay.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赞赏是不耍流氓的鼓励</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/26/分布式配置中心/" class="next-post btn btn-default" title="分布式配置中心(Greenwich.SR2版本)示例">
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">分布式配置中心(Greenwich.SR2版本)示例</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+   <p>评论系统未开启，无法评论！</p>
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#服务发现：Eureka-Server"><span class="toc-text">服务发现：Eureka Server</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#如何引入Eureka-Server"><span class="toc-text">如何引入Eureka Server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何运行Eureka-Server"><span class="toc-text">如何运行Eureka Server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#High-Availability-Zones-and-Regions"><span class="toc-text">High Availability, Zones and Regions</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#独立模式"><span class="toc-text">独立模式</span></a></li></ol></li></ol><li class="toc-item toc-level-2"><a class="toc-link" href="#Peer-Awareness"><span class="toc-text">Peer Awareness</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#When-to-Prefer-IP-Address"><span class="toc-text">When to Prefer IP Address</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Securing-The-Eureka-Server"><span class="toc-text">Securing The Eureka Server</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JDK-11-支持"><span class="toc-text">JDK 11 支持</span></a>
+        
+    </li></div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
