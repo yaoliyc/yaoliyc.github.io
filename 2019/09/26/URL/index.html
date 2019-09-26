@@ -29,7 +29,7 @@
     <!--Title-->
 
 
-<title>java内存区域与内存溢出异常 | 屹的小世界</title>
+<title>URL | 屹的小世界</title>
 
 
     <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
@@ -145,9 +145,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="java内存区域与内存溢出异常">
+        <h1 id="URL">
             
-	            java内存区域与内存溢出异常
+	            URL
             
         </h1>
         <div class="post-meta">
@@ -167,12 +167,16 @@
         <span class="tags-meta">
             
                 
-                    <a href="/tags/java" title="java">
-                        java
-                    </a>
-                
                     <a href="/tags/笔记" title="笔记">
                         笔记
+                    </a>
+                
+                    <a href="/tags/mysql" title="mysql">
+                        mysql
+                    </a>
+                
+                    <a href="/tags/JDBC" title="JDBC">
+                        JDBC
                     </a>
                 
             
@@ -184,7 +188,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2019/07/07</span>
+            <span class="date-meta">2019/09/26</span>
         </span>
         
             <span class="fa-wrap">
@@ -200,13 +204,69 @@
     </div>
     
     <div class="post-body post-content">
-        <h1 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h1><h2 id="程序技术器"><a href="#程序技术器" class="headerlink" title="程序技术器"></a>程序技术器</h2><p>程序计数器可以看作是当前线程执行的字节码的行号指示器。每个线程有一个独立的程序计数器，各线程之间计数器互不印象，独立存储，这类内存区域为“线程私有”的内存。此内存区域是唯一一在Java虚拟机规范中没有规定任何OutOfMemoryError情况的区域。</p>
-<h2 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h2><p>Java虚拟机栈也是线程私有，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的内存模型。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够的内存，就会跑出OutOfMemoryError异常。</p>
-<h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p>本地方法栈为虚拟机使用到的Native方法服务，改区域也会抛出StackOverflowError和OutOfMemoryError异常。</p>
-<h2 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h2><p>Java堆被所以此案城共享，几乎所以的对象实例都在这里分配内存。从内存回收的角度来看，java堆还可以细分为：新生代和老年代；再细致一点有Eden空间、From Survivor空间、To Survivor空间。堆的大小可通过参数-Xmx和-Xms控制。如果在堆中没有内存完成实例分配，并且堆也无法再扩展时，将会抛出OutOfMemoryError异常。</p>
-<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><p>各线程共享的内存区域，又称永久代，本质上两者并不等价。通过参数-XX:MaxPermSize控制上限。当方法区无法满足内存分配需求时将抛出OutOfMemoryError异常。</p>
-<h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><p>运行时常量池是方法区的一部分。受方法区内存的限制，当常量池无法再申请到内存时会抛出OutOfMemoryError异常。</p>
-<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><p>在JDK1.4中新加入了NIO类，引入了一种基于通道与缓冲区的I/O方式，因为避免了再Java堆和Native堆中来回复制数据，在一些场景中能显著提高性能。本机直接内存的分配不收Java堆大小的限制，但受本机总内存（包括RAM以及SWAP区或者分页文件）大小以及处理器寻址空间的限制。由于经常忽略直接内存，是的各个内存区域总和大于物理内存限制（包括物理的和操作系统级的限制），从而导致动态扩展时出现OutOfMemoryError异常。</p>
+        <h2 id="连接URL形式"><a href="#连接URL形式" class="headerlink" title="连接URL形式"></a>连接URL形式</h2><p>连接URL的一般格式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protocol//[hosts][/database][?properties]</span><br></pre></td></tr></table></figure>
+<p>URL由以下部分组成：</p>
+<p>​    任何URL的保留字符必须转义编码</p>
+<h3 id="protocol"><a href="#protocol" class="headerlink" title="protocol"></a><em>protocol</em></h3><p>连接有三种形式：</p>
+<ul>
+<li>jdbc:mysql:用于普通和基本故障转移连接</li>
+<li>jdbc:mysql:loadbalance:用于配置负载平衡</li>
+<li>jdbc:mysql:replication:用于配置复制设置</li>
+</ul>
+<h3 id="hosts"><a href="#hosts" class="headerlink" title="hosts"></a><em>hosts</em></h3><p>根据情况，主机部分可以仅由主机名组成，也可以是由各种元素组成的复杂结构，例如多个主机名，端口号，特定于主机的属性和用户凭据。</p>
+<ul>
+<li><p>单个主机</p>
+<ul>
+<li><p>单主机连接而不添加主机特定的属性：</p>
+<ul>
+<li><p>hosts部分格式为host:port,示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://host1:33060/sakila</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当host未定义，默认值未localhost.</p>
+</li>
+<li><p>port为标准的端口号，1到65535整型，默认值为3306.</p>
+</li>
+</ul>
+</li>
+<li><p>单主机连接添加了主机特定的属性：</p>
+<ul>
+<li>以key=value形式递归，形如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">address=(host=host_or_ip)(port=port)(key1=value1)(key2=value2)...(keyN=valueN)</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://address=(host=myhost)(port=1111)(key1=value1)/db</span><br></pre></td></tr></table></figure>
+<p>这是iPv6地址的强制格式，但它也支持iPv4地址。</p>
+<ul>
+<li>主机和端口号用host,port为key定义，默认值约定同单主机不添加特定属性。</li>
+<li>其他的key覆写全局值，Limit the overrides to user, password, network timeouts, and statement and metadata cache sizes；the effects of other per-host overrides are not defined.</li>
+<li>Key大小写敏感，两个仅大小写不用的Key被认为冲突，不确定哪个会被应用。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>多台主机</p>
+<ul>
+<li><p>多台主机以逗号隔开：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host1,host2,...,hostN</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://myhost1:1111,myhost2:2222/db</span><br><span class="line">jdbc:mysql://address=(host=myhost1)(port=1111)(key1=value1),address=(host=myhost2)(port=2222)(key2=value2)/db</span><br><span class="line">jdbc:mysql://myhost1:1111,address=(host=myhost2)(port=2222)(key2=value2)/db</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>用户凭证</p>
+<p>用户凭证可以在连接URL之外设置，例如从java.sql.DriverManager获取连接时作为参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(user=sandy)(password=mypass)</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://address=(host=myhost1)(port=1111)(user=sandy)(password=secret),address=(host=myhost2)(port=2222)(user=finn)(password=secret)/db</span><br></pre></td></tr></table></figure>
+<p>当定义多个用户凭证时，最左边的生效。</p>
+</li>
+</ul>
+<h3 id="database"><a href="#database" class="headerlink" title="database"></a><em>database</em></h3><p>要打开的默认数据库或目录。如果database未定义，连接没有默认的数据库。此时通过调用Connection实例setCatalog()方法或使用具体数据库名来定义表(形如：SELECT <em>dbname</em>.<em>tablename</em>.<em>colname</em> FROM dbname.tablename…)。</p>
+<h3 id="properties"><a href="#properties" class="headerlink" title="properties"></a><em>properties</em></h3><p>一系列适用于所有主机的全局属性。示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://(host=myhost1,port=1111),(host=myhost2,port=2222)/db?key1=value1&amp;key2=value2&amp;key3=value3</span><br></pre></td></tr></table></figure>
 
     </div>
     
@@ -244,15 +304,10 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2019/07/08/垃圾收集器与内存分配策略/" class="pre-post btn btn-default" title="垃圾收集器与内存分配策略">
-            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">垃圾收集器与内存分配策略</span>
-        </a>
     
-    
-        <a href="/2019/02/02/maven笔记-依赖范围/" class="next-post btn btn-default" title="maven笔记-依赖范围">
+        <a href="/2019/08/28/spring-boot汇总/" class="next-post btn btn-default" title="spring-boot汇总">
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">maven笔记-依赖范围</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">spring-boot汇总</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -274,7 +329,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#运行时数据区域"><span class="toc-text">运行时数据区域</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#程序技术器"><span class="toc-text">程序技术器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java虚拟机栈"><span class="toc-text">Java虚拟机栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#本地方法栈"><span class="toc-text">本地方法栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java堆"><span class="toc-text">Java堆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方法区"><span class="toc-text">方法区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行时常量池"><span class="toc-text">运行时常量池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#直接内存"><span class="toc-text">直接内存</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#连接URL形式"><span class="toc-text">连接URL形式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#protocol"><span class="toc-text">protocol</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hosts"><span class="toc-text">hosts</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#database"><span class="toc-text">database</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#properties"><span class="toc-text">properties</span></a></li></ol></li></ol>
         
     </div>
 </aside>

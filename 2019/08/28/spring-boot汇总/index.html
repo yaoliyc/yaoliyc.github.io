@@ -29,7 +29,7 @@
     <!--Title-->
 
 
-<title>java内存区域与内存溢出异常 | 屹的小世界</title>
+<title>spring-boot汇总 | 屹的小世界</title>
 
 
     <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
@@ -145,9 +145,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="java内存区域与内存溢出异常">
+        <h1 id="spring-boot汇总">
             
-	            java内存区域与内存溢出异常
+	            spring-boot汇总
             
         </h1>
         <div class="post-meta">
@@ -175,6 +175,10 @@
                         笔记
                     </a>
                 
+                    <a href="/tags/spring boot" title="spring boot">
+                        spring boot
+                    </a>
+                
             
         </span>
     </span>
@@ -184,7 +188,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2019/07/07</span>
+            <span class="date-meta">2019/08/28</span>
         </span>
         
             <span class="fa-wrap">
@@ -200,13 +204,8 @@
     </div>
     
     <div class="post-body post-content">
-        <h1 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h1><h2 id="程序技术器"><a href="#程序技术器" class="headerlink" title="程序技术器"></a>程序技术器</h2><p>程序计数器可以看作是当前线程执行的字节码的行号指示器。每个线程有一个独立的程序计数器，各线程之间计数器互不印象，独立存储，这类内存区域为“线程私有”的内存。此内存区域是唯一一在Java虚拟机规范中没有规定任何OutOfMemoryError情况的区域。</p>
-<h2 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h2><p>Java虚拟机栈也是线程私有，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的内存模型。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够的内存，就会跑出OutOfMemoryError异常。</p>
-<h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p>本地方法栈为虚拟机使用到的Native方法服务，改区域也会抛出StackOverflowError和OutOfMemoryError异常。</p>
-<h2 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h2><p>Java堆被所以此案城共享，几乎所以的对象实例都在这里分配内存。从内存回收的角度来看，java堆还可以细分为：新生代和老年代；再细致一点有Eden空间、From Survivor空间、To Survivor空间。堆的大小可通过参数-Xmx和-Xms控制。如果在堆中没有内存完成实例分配，并且堆也无法再扩展时，将会抛出OutOfMemoryError异常。</p>
-<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><p>各线程共享的内存区域，又称永久代，本质上两者并不等价。通过参数-XX:MaxPermSize控制上限。当方法区无法满足内存分配需求时将抛出OutOfMemoryError异常。</p>
-<h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><p>运行时常量池是方法区的一部分。受方法区内存的限制，当常量池无法再申请到内存时会抛出OutOfMemoryError异常。</p>
-<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><p>在JDK1.4中新加入了NIO类，引入了一种基于通道与缓冲区的I/O方式，因为避免了再Java堆和Native堆中来回复制数据，在一些场景中能显著提高性能。本机直接内存的分配不收Java堆大小的限制，但受本机总内存（包括RAM以及SWAP区或者分页文件）大小以及处理器寻址空间的限制。由于经常忽略直接内存，是的各个内存区域总和大于物理内存限制（包括物理的和操作系统级的限制），从而导致动态扩展时出现OutOfMemoryError异常。</p>
+        <h3 id="Spring-Boot-Actuator"><a href="#Spring-Boot-Actuator" class="headerlink" title="Spring Boot Actuator"></a>Spring Boot Actuator</h3><p>微服务监控治理</p>
+<h3 id="Spring-Boot-Admin"><a href="#Spring-Boot-Admin" class="headerlink" title="Spring Boot Admin"></a>Spring Boot Admin</h3><p>基于Spring Boot Actuator带有图形化的微服务监控</p>
 
     </div>
     
@@ -244,15 +243,15 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2019/07/08/垃圾收集器与内存分配策略/" class="pre-post btn btn-default" title="垃圾收集器与内存分配策略">
+        <a href="/2019/09/26/URL/" class="pre-post btn btn-default" title="URL">
             <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">垃圾收集器与内存分配策略</span>
+            <span class="hidden-xs">URL</span>
         </a>
     
     
-        <a href="/2019/02/02/maven笔记-依赖范围/" class="next-post btn btn-default" title="maven笔记-依赖范围">
+        <a href="/2019/08/27/服务的注册与发现Eureka/" class="next-post btn btn-default" title="服务的注册与发现Eureka">
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">maven笔记-依赖范围</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">服务的注册与发现Eureka</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -274,7 +273,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#运行时数据区域"><span class="toc-text">运行时数据区域</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#程序技术器"><span class="toc-text">程序技术器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java虚拟机栈"><span class="toc-text">Java虚拟机栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#本地方法栈"><span class="toc-text">本地方法栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java堆"><span class="toc-text">Java堆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方法区"><span class="toc-text">方法区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行时常量池"><span class="toc-text">运行时常量池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#直接内存"><span class="toc-text">直接内存</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring-Boot-Actuator"><span class="toc-text">Spring Boot Actuator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring-Boot-Admin"><span class="toc-text">Spring Boot Admin</span></a></li></ol>
         
     </div>
 </aside>
