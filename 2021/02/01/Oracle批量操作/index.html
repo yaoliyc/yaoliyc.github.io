@@ -29,7 +29,7 @@
     <!--Title-->
 
 
-<title>css笔记 | 屹的小世界</title>
+<title>mybatis Oracle批量操作 | 屹的小世界</title>
 
 
     <link rel="alternate" href="/atom.xml" title="屹的小世界" type="application/atom+xml">
@@ -145,9 +145,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="css笔记">
+        <h1 id="mybatis Oracle批量操作">
             
-	            css笔记
+	            mybatis Oracle批量操作
             
         </h1>
         <div class="post-meta">
@@ -155,8 +155,8 @@
     
     <span class="categories-meta fa-wrap">
         <i class="fa fa-folder-open-o"></i>
-        <a href="/categories/前端">
-            前端
+        <a href="/categories/后端">
+            后端
         </a>
     </span>
     
@@ -167,12 +167,12 @@
         <span class="tags-meta">
             
                 
-                    <a href="/tags/笔记" title="笔记">
-                        笔记
+                    <a href="/tags/java" title="java">
+                        java
                     </a>
                 
-                    <a href="/tags/CSS" title="CSS">
-                        CSS
+                    <a href="/tags/mybatis" title="mybatis">
+                        mybatis
                     </a>
                 
             
@@ -184,7 +184,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2019/08/05</span>
+            <span class="date-meta">2021/02/01</span>
         </span>
         
             <span class="fa-wrap">
@@ -197,33 +197,11 @@
 
             
             
-            <p class="fa fa-exclamation-triangle warning">
-                本文于<strong>546</strong>天之前发表，文中内容可能已经过时。
-            </p>
-        
     </div>
     
     <div class="post-body post-content">
-        <h2 id="盒模型-宽度"><a href="#盒模型-宽度" class="headerlink" title="盒模型-宽度"></a>盒模型-宽度</h2><ol>
-<li>没有（就是没有设置width的）宽度的元素始终会扩展到填满其父元素的宽度位置。添加水平边框、内边距和外边距，会导致内容宽度减少，减少量等于水平边框、内边距和外边距的和。</li>
-<li>为设定了宽度的盒子添加边框、内边距和外边距，会导致盒子扩展的更宽。实际上，盒子的width属性设定的只是盒子内容区的宽度，而非盒子要占据的水平宽度。</li>
-</ol>
-<h2 id="浮动与清除"><a href="#浮动与清除" class="headerlink" title="浮动与清除"></a>浮动与清除</h2><h3 id="围住浮动元素的三种方法"><a href="#围住浮动元素的三种方法" class="headerlink" title="围住浮动元素的三种方法"></a>围住浮动元素的三种方法</h3><ol>
-<li>为父元素添加overflow:hidden</li>
-<li>同时浮动父元素</li>
-<li>添加非浮动的清除元素，可以直接在标记中加，也可以通过给父元素添加clearfix类来加</li>
-</ol>
-<h2 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h2><ol>
-<li>默认静态定位，默认文档流。</li>
-<li>相对定位，相对于原来在文档流中的位置（或者默认位置），默认的空间仍然被占据，默认文档流</li>
-<li>绝对定位，默认相对于body定位，脱离默认文档流。</li>
-<li>固定定位，相对于视口定位，不随页面滚动而移动，脱离默认文档流。</li>
-</ol>
-<p>定位上下文:绝对定位元素默认的定位上下文是body，绝对定位元素的任何postion为relative的祖先元素。</p>
-<h2 id="显示属性"><a href="#显示属性" class="headerlink" title="显示属性"></a>显示属性</h2><ul>
-<li>块级元素，比如段落、标题、列表等，在浏览器中上下堆叠显示。</li>
-<li>行内元素，比如a、span和img，在浏览器中左右并排显示，只有前一行没有空间才会显示到下一行。</li>
-</ul>
+        <p>1、批量插入<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"insertBatch"</span> <span class="attr">parameterType</span>=<span class="string">"java.util.List"</span>&gt;</span></span><br><span class="line">    INSERT INTO T_CITY_INDEX(</span><br><span class="line">    id,city_code</span><br><span class="line">    )</span><br><span class="line">    select SEQ_CITY_INDEX.NEXTVAL,cd.* from(</span><br><span class="line">    <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"list"</span> <span class="attr">item</span>=<span class="string">"item"</span> <span class="attr">index</span>=<span class="string">"index"</span>  <span class="attr">close</span>=<span class="string">")"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">"union"</span>&gt;</span></span><br><span class="line">        select</span><br><span class="line">        #&#123;item.cityCode,jdbcType=VARCHAR&#125;,</span><br><span class="line">        #&#123;item.cityName,jdbcType=VARCHAR&#125;</span><br><span class="line">        from dual</span><br><span class="line">    <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line">    ) cd</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2、批量更新<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">"updateBatch"</span>  <span class="attr">parameterType</span>=<span class="string">"java.util.List"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"list"</span> <span class="attr">item</span>=<span class="string">"item"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">open</span>=<span class="string">"begin"</span> <span class="attr">close</span>=<span class="string">";end;"</span> <span class="attr">separator</span>=<span class="string">";"</span>&gt;</span></span><br><span class="line">        update T_CITY_INDEX t</span><br><span class="line">        set</span><br><span class="line">        t.city_name= #&#123;item.cityName,jdbcType=VARCHAR&#125; ,</span><br><span class="line">        t.district_name= #&#123;item.districtName,jdbcType=VARCHAR&#125; ,</span><br><span class="line">        where t.id = #&#123;item.id,jdbcType=NUMERIC&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 
     </div>
     
@@ -261,15 +239,10 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2019/08/19/CSS揭秘示例/" class="pre-post btn btn-default" title="CSS揭秘示例">
-            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">CSS揭秘示例</span>
-        </a>
     
-    
-        <a href="/2019/07/08/垃圾收集器与内存分配策略/" class="next-post btn btn-default" title="垃圾收集器与内存分配策略">
+        <a href="/2020/02/25/记一次数据库调整/" class="next-post btn btn-default" title="记一次数据库调整">
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">垃圾收集器与内存分配策略</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">记一次数据库调整</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -291,7 +264,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#盒模型-宽度"><span class="toc-text">盒模型-宽度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#浮动与清除"><span class="toc-text">浮动与清除</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#围住浮动元素的三种方法"><span class="toc-text">围住浮动元素的三种方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定位"><span class="toc-text">定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#显示属性"><span class="toc-text">显示属性</span></a></li></ol>
+            <p>暂无目录</p>
         
     </div>
 </aside>
