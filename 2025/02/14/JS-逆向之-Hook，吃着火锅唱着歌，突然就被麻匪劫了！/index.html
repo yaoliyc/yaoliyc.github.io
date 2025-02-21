@@ -38,13 +38,15 @@
 <meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
 <meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
 <meta property="article:published_time" content="2025-02-14T10:01:33.000Z">
-<meta property="article:modified_time" content="2025-02-21T08:36:51.316Z">
+<meta property="article:modified_time" content="2025-02-21T09:03:06.751Z">
 <meta property="article:author" content="屹">
 <meta property="article:tag" content="爬虫">
 <meta property="article:tag" content="hook">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.gif">
   
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
   
   
   <title>JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！ - 读书笔记</title>
@@ -85,7 +87,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -95,6 +97,17 @@
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
   
+
+  
+
+  
+
+  
+
+  
+
+  
+
 
 
   
@@ -668,6 +681,32 @@
     </div>
   
   
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
   
 </div>
 
@@ -812,6 +851,8 @@
   <script>Fluid.plugins.imageCaption();</script>
 
   <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
 
 
 
