@@ -22,21 +22,21 @@
     <meta name="description" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果 Excerpt基于大模型的应用中，最大的需求应该就是RAG，里面涉及很多技术环节，本文主要讲述了其中的文本分块Chunking环节，包括为什么分块、分块的方法，以及一些工程化优化的方式。    本文主要内容：  RAG中涉及的技术环节  什么是分块  分块需要考虑的四种因素  分块的多种方法    RAG是一个考验技术的工">
 <meta property="og:type" content="article">
 <meta property="og:title" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果">
-<meta property="og:url" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/index.html">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/index.html">
 <meta property="og:site_name" content="读书笔记">
 <meta property="og:description" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果 Excerpt基于大模型的应用中，最大的需求应该就是RAG，里面涉及很多技术环节，本文主要讲述了其中的文本分块Chunking环节，包括为什么分块、分块的方法，以及一些工程化优化的方式。    本文主要内容：  RAG中涉及的技术环节  什么是分块  分块需要考虑的四种因素  分块的多种方法    RAG是一个考验技术的工">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
-<meta property="article:published_time" content="2025-02-25T07:22:14.966Z">
-<meta property="article:modified_time" content="2025-02-25T07:22:14.966Z">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="article:published_time" content="2025-03-02T09:23:19.773Z">
+<meta property="article:modified_time" content="2025-03-02T09:23:19.773Z">
 <meta property="article:author" content="屹">
 <meta property="article:tag" content="RAG">
 <meta property="article:tag" content="Chunking">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -244,8 +244,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-02-25 07:22" pubdate>
-          2025年2月25日 早上
+        <time datetime="2025-03-02 09:23" pubdate>
+          2025年3月2日 上午
         </time>
       </span>
     
@@ -327,12 +327,12 @@
 </ul>
 </blockquote>
 <h2 id="RAG是一个考验技术的工作"><a href="#RAG是一个考验技术的工作" class="headerlink" title="RAG是一个考验技术的工作"></a>RAG是一个考验技术的工作</h2><p>这两周发的文章大模型偏多，但如果你有阅读过前面的文章，你会发现我其实不是为了说大模型而说大模型（有点绕），我更多的是在写怎么解决企业应用中真正的难题。这个真正难题我在前面的文章中<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIyOTA5NTM1OA==&mid=2247484135&idx=1&sn=82e93f5c69f11b60f3e8bb1afb5d5107&chksm=e846a036df31292022d31320db7b50b381519d24d405489be821257df7deb9f95630f090f590&scene=21#wechat_redirect">《一些LLM的声音总结》</a>中提到过，基于大模型的企业应用中很大一部分需求就是RAG——检索增强生成。</p>
-<p><img src="/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p><img src="/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
 <p>这个流程依然无法描述RAG的复杂性  </p>
 <p>RAG涉及的内容其实广泛，包括Embedding、分词分块、检索召回（相似度匹配）、chat系统、ReAct和Prompt优化等，最后还有与LLM的交互，整个过程技术复杂度很高。如果你用的LLM非常好，反而大模型这一块是你最不需要关心的。而这些环节里面我们每个都没达到1（比如0.9、0.7…），那么最终的结果可能是这些小数点的乘积。如果我们每个环节都可以做到&gt;1.0，那么最终的结果会比上一个结果高出很多。</p>
 <p>今天我们来聊聊分块，很重要的一个环节（没有哪个环节不重要），但它也许是我们容易做到高质量的一个环节。</p>
 <h2 id="什么是分块？"><a href="#什么是分块？" class="headerlink" title="什么是分块？"></a>什么是分块？</h2><p>在构建RAG这类基于LLM的应用程序中，分块（chunking）是将大块文本分解成小段的过程。当我们使用LLM embedding内容时，这是一项必要的技术，可以帮助我们优化从向量数据库被召回的内容的准确性。在本文中，我们将探讨它是否以及如何帮助提高RAG应用程序的效率和准确性。</p>
-<p><img src="/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p><img src="/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
 <p>Pinecone是领先的向量数据库供应商  </p>
 <p>在向量数据库（如：Pinecone）中索引的任何内容都需要首先Embedding（可以看我上一篇文章<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIyOTA5NTM1OA==&mid=2247484246&idx=1&sn=c0b4f64e829bc336d516b4c79bbda19c&chksm=e846a187df31289169516fdf09ebfc3235dfcc11f467cf9541b022b2f3381a5c464db37f4da6&scene=21#wechat_redirect">大模型应用中大部分人真正需要去关心的核心——Embedding</a>）。分块的主要原因是尽量减少我们<strong>Embedding内容的噪音</strong>。</p>
 <p>例如，在语义搜索中，我们索引一个文档语料库，每个文档包含一个特定主题的有价值的信息。通过使用有效的分块策略，我们可以确保搜索结果准确地捕获用户查询的需求本质。如果我们的块太小或太大，可能会导致不精确的搜索结果或错过展示相关内容的机会。根据经验，如果文本块尽量是语义独立的，也就是没有对上下文很强的依赖，这样子对语言模型来说是最易于理解的。因此，为语料库中的文档<strong>找到最佳块大小对于确保搜索结果的准确性和相关性至关重要</strong>。</p>
@@ -385,14 +385,14 @@
 </ul>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> SpacyTextSplitter<br>text_splitter = SpaCyTextSplitter()<br>docs = text_splitter.split_text(text)<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p><img src="/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
 <p>spacy-llm package  </p>
 <h4 id="递归分割"><a href="#递归分割" class="headerlink" title="递归分割"></a>递归分割</h4><p>递归分块使用一组分隔符以分层和迭代的方式将输入文本分成更小的块。如果分割文本开始的时候没有产生所需大小或结构的块，那么这个方法会使用不同的分隔符或标准对生成的块递归调用，直到获得所需的块大小或结构。这意味着虽然这些块的大小并不完全相同，但它们仍然会逼近差不多的大小。</p>
 <p>这里有一个例子，如何配合LangChain使用递归分块:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> RecursiveCharacterTextSplitter<br>text_splitter = RecursiveCharacterTextSplitter(<br>    <span class="hljs-comment"># 设置一个非常小的块大小。</span><br>    chunk_size = <span class="hljs-number">256</span>,<br>    chunk_overlap  = <span class="hljs-number">20</span><br>)<br><br>docs = text_splitter.create_documents([text])<br></code></pre></td></tr></table></figure>
 
 <h4 id="专门的分块"><a href="#专门的分块" class="headerlink" title="专门的分块"></a>专门的分块</h4><p>Markdown和LaTeX是您可能遇到的结构化和格式化内容的两个例子。在这些情况下，可以使用专门的分块方法在分块过程中保留内容的原始结构。</p>
-<p><img src="/2025/02/25/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p><img src="/2025/03/02/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
 <p>本文就是用markdown写作的  </p>
 <ul>
 <li><strong>Markdown</strong>: Markdown是一种轻量级的标记语言，通常用于格式化文本。通过识别Markdown语法(例如，标题、列表和代码块)，您可以根据其结构和层次结构智能地划分内容，从而生成语义更连贯的块。例如:</li>
@@ -470,7 +470,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</div>
-      <div>http://yaoliyc.github.io/2025/02/25/最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果/</div>
+      <div>http://yaoliyc.github.io/2025/03/02/最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果/</div>
     </div>
     <div class="license-meta">
       
@@ -482,7 +482,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年2月25日</div>
+          <div>2025年3月2日</div>
         </div>
       
       
@@ -514,9 +514,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/02/25/AI%E5%B7%A5%E7%A8%8B%E5%B8%88%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" title="AI工程师学习计划">
+                      <a href="/2025/03/02/Miniconda%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/" title="Miniconda的安装和使用">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">AI工程师学习计划</span>
+                        <span class="hidden-mobile">Miniconda的安装和使用</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -524,8 +524,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案">
-                        <span class="hidden-mobile">Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</span>
+                      <a href="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/" title="用好大模型?这5种实用的Prompt框架你一定要看看">
+                        <span class="hidden-mobile">用好大模型?这5种实用的Prompt框架你一定要看看</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
