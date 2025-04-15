@@ -19,24 +19,29 @@
   <meta name="author" content="屹">
   <meta name="keywords" content="">
   
-    <meta name="description" content="要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料：1. Python编程 学习内容：基础语法、数据结构、面向对象编程、常用库（NumPy、Pandas、Scikit-learn）。 推荐资源： 书籍：《Python编程：从入门到实践》（Eric Matthes）、《利用Python进行数据分析》（Wes McKinney）。 课程：Coursera Python f">
+    <meta name="description" content="关于mysql做距离筛选的两种方法 - 降温了 - 博客园使用mysql自带的函数计算距离作为筛选条件 这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死  12345678&#x2F;***  @param :lat 纬度*  @param :lon 经度*  @param :dis 距离范围**&#x2F;SELECT a.*,ROUND(6378.138 * 2 * A">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AI工程师学习计划">
-<meta property="og:url" content="http://yaoliyc.github.io/2025/02/25/AI%E5%B7%A5%E7%A8%8B%E5%B8%88%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/index.html">
+<meta property="og:title" content="关于mysql做距离筛选的两种方法">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/index.html">
 <meta property="og:site_name" content="读书笔记">
-<meta property="og:description" content="要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料：1. Python编程 学习内容：基础语法、数据结构、面向对象编程、常用库（NumPy、Pandas、Scikit-learn）。 推荐资源： 书籍：《Python编程：从入门到实践》（Eric Matthes）、《利用Python进行数据分析》（Wes McKinney）。 课程：Coursera Python f">
+<meta property="og:description" content="关于mysql做距离筛选的两种方法 - 降温了 - 博客园使用mysql自带的函数计算距离作为筛选条件 这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死  12345678&#x2F;***  @param :lat 纬度*  @param :lon 经度*  @param :dis 距离范围**&#x2F;SELECT a.*,ROUND(6378.138 * 2 * A">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-02-25T03:22:45.000Z">
-<meta property="article:modified_time" content="2025-02-25T03:28:48.232Z">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325151107218-966233511.png">
+<meta property="article:published_time" content="2025-04-15T08:16:15.000Z">
+<meta property="article:modified_time" content="2025-04-15T08:22:21.230Z">
 <meta property="article:author" content="屹">
-<meta property="article:tag" content="AI">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="实用操作">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>AI工程师学习计划 - 读书笔记</title>
+  <title>关于mysql做距离筛选的两种方法 - 读书笔记</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +232,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="AI工程师学习计划"></span>
+            <span id="subtitle" data-typed-text="关于mysql做距离筛选的两种方法"></span>
           
         </div>
 
@@ -238,8 +243,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-02-25 11:22" pubdate>
-          2025年2月25日 上午
+        <time datetime="2025-04-15 16:16" pubdate>
+          2025年4月15日 下午
         </time>
       </span>
     
@@ -250,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          664 字
+          445 字
         
       </span>
     
@@ -261,7 +266,7 @@
         
         
         
-          6 分钟
+          4 分钟
         
       </span>
     
@@ -298,88 +303,34 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">AI工程师学习计划</h1>
+            <h1 id="seo-header">关于mysql做距离筛选的两种方法</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料："><a href="#要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料：" class="headerlink" title="要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料："></a>要符合上述AI工程师岗位要求，你需要系统学习以下知识和技能，并推荐相关教程与材料：</h1><h3 id="1-Python编程"><a href="#1-Python编程" class="headerlink" title="1. Python编程"></a><strong>1. Python编程</strong></h3><ul>
-<li><strong>学习内容</strong>：基础语法、数据结构、面向对象编程、常用库（NumPy、Pandas、Scikit-learn）。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>书籍</strong>：《Python编程：从入门到实践》（Eric Matthes）、《利用Python进行数据分析》（Wes McKinney）。</li>
-<li><strong>课程</strong>：Coursera <a target="_blank" rel="noopener" href="https://www.coursera.org/specializations/python">Python for Everybody</a>、廖雪峰Python教程（中文免费）。</li>
-<li><strong>实战</strong>：LeetCode刷题、Kaggle数据分析项目。</li>
+                <h1 id="关于mysql做距离筛选的两种方法-降温了-博客园"><a href="#关于mysql做距离筛选的两种方法-降温了-博客园" class="headerlink" title="关于mysql做距离筛选的两种方法 - 降温了 - 博客园"></a>关于mysql做距离筛选的两种方法 - 降温了 - 博客园</h1><h2 id="使用mysql自带的函数计算距离作为筛选条件"><a href="#使用mysql自带的函数计算距离作为筛选条件" class="headerlink" title="使用mysql自带的函数计算距离作为筛选条件"></a>使用mysql自带的函数计算距离作为筛选条件</h2><ul>
+<li>这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死</li>
 </ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">/**</span><br><span class="hljs-comment">*  @param :lat 纬度</span><br><span class="hljs-comment">*  @param :lon 经度</span><br><span class="hljs-comment">*  @param :dis 距离范围</span><br><span class="hljs-comment">**/</span><br><span class="hljs-keyword">SELECT</span> a.<span class="hljs-operator">*</span>,ROUND(<span class="hljs-number">6378.138</span> <span class="hljs-operator">*</span> <span class="hljs-number">2</span> <span class="hljs-operator">*</span> <span class="hljs-built_in">ASIN</span>(<span class="hljs-built_in">SQRT</span>(POW(<span class="hljs-built_in">SIN</span>((:lat <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span> <span class="hljs-operator">-</span> a.latitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">/</span> <span class="hljs-number">2</span>), <span class="hljs-number">2</span>) <span class="hljs-operator">+</span> <span class="hljs-built_in">COS</span>(:lat <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">*</span> <span class="hljs-built_in">COS</span>(a.latitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">*</span> POW(<span class="hljs-built_in">SIN</span>((:lon <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span> <span class="hljs-operator">-</span> a.longitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">/</span> <span class="hljs-number">2</span>), <span class="hljs-number">2</span>))) <span class="hljs-operator">*</span> <span class="hljs-number">1000</span>) <span class="hljs-keyword">AS</span> distance <span class="hljs-keyword">FROM</span> maoyan_cinema a <span class="hljs-keyword">WHERE</span> a.del_flag <span class="hljs-operator">=</span> <span class="hljs-number">0</span> <span class="hljs-keyword">HAVING</span> distance <span class="hljs-operator">&lt;</span> :dis <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> distance <span class="hljs-keyword">ASC</span><br><br><br></code></pre></td></tr></table></figure>
+
+<h2 id="使用redis计算距离"><a href="#使用redis计算距离" class="headerlink" title="使用redis计算距离"></a>使用redis计算距离</h2><ul>
+<li>先将数据库里的数据全部导入到redis（经纬度和主键）即可</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//导入到redis部分代码</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">syncGeo</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">//查询经度纬度主键id保存在list</span><br>        List&lt;Object[]&gt; list = xxx.getStationPoint();<br>        <span class="hljs-keyword">if</span> (CollectionUtils.isEmpty(list) || list.size() &lt; <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        Map&lt;Long, Point&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;(hashMapInitialCapacity);<br>        <span class="hljs-keyword">for</span> (Object[] o : list) &#123;<br>            map.put(Long.parseLong(o[<span class="hljs-number">0</span>].toString()), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(Double.parseDouble(o[<span class="hljs-number">2</span>].toString()), Double.parseDouble(o[<span class="hljs-number">1</span>].toString())));<br>        &#125;<br>        <span class="hljs-type">GeoOperations</span> <span class="hljs-variable">geoOperations</span> <span class="hljs-operator">=</span> redisTemplate.opsForGeo();<br>        <span class="hljs-type">Long</span> <span class="hljs-variable">stations</span> <span class="hljs-operator">=</span> geoOperations.geoAdd(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, map);<br>        redisTemplate.expire(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, <span class="hljs-number">2</span>, TimeUnit.DAYS);<br>    &#125;<br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>保存完后在redis可视化工具可以看到<br>  <img src="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+<li><p>也可以使用命令行查看其中的某条记录<br>  <img src="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325151107218-966233511.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+<li><p>geo计算满足距离范围内主键id列表</p>
 </li>
 </ul>
-<hr>
-<h3 id="2-机器学习与深度学习"><a href="#2-机器学习与深度学习" class="headerlink" title="2. 机器学习与深度学习"></a><strong>2. 机器学习与深度学习</strong></h3><ul>
-<li><strong>学习内容</strong>：监督&#x2F;无监督学习、模型评估、神经网络、CNN&#x2F;RNN、迁移学习等。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>书籍</strong>：《机器学习》（周志华）、《深度学习》（花书，Ian Goodfellow）。</li>
-<li><strong>课程</strong>：吴恩达 <a target="_blank" rel="noopener" href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>（Coursera）、<a target="_blank" rel="noopener" href="https://www.coursera.org/specializations/deep-learning">Deep Learning Specialization</a>。</li>
-<li><strong>框架</strong>：PyTorch官方教程（<a target="_blank" rel="noopener" href="https://pytorch.org/tutorials/">PyTorch Tutorials</a>）、TensorFlow官方文档（<a target="_blank" rel="noopener" href="https://www.tensorflow.org/guide">TF Guide</a>）。</li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Circle</span> <span class="hljs-variable">circle</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Circle</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(<span class="hljs-string">&quot;入参经度&quot;</span>, <span class="hljs-string">&quot;入参纬度&quot;</span>), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Distance</span>(<span class="hljs-string">&quot;距离范围&quot;</span>, Metrics.KILOMETERS));<br> <span class="hljs-comment">//这里限制1w条，可根据实际业务确定需要多少条数据</span><br> RedisGeoCommands.<span class="hljs-type">GeoRadiusCommandArgs</span> <span class="hljs-variable">args</span> <span class="hljs-operator">=</span> RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending().limit(<span class="hljs-number">10000</span>);<br> GeoResults&lt;RedisGeoCommands.GeoLocation&lt;Integer&gt;&gt; results = geoOperations.geoRadius(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, circle, args);<br> Map&lt;Long, Double&gt; stationIdsAndDistance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashMap</span>&lt;&gt;();<br> List&lt;GeoResult&lt;RedisGeoCommands.GeoLocation&lt;Integer&gt;&gt;&gt; content = results.getContent();<br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>得到范围内的所有主键id,再使用mysql进行各种条件筛选。这种方式可以用到索引，测试geo计算距离也很快，只需要几毫秒</li>
 </ul>
-</li>
-</ul>
-<hr>
-<h3 id="3-NLP与大模型"><a href="#3-NLP与大模型" class="headerlink" title="3. NLP与大模型"></a><strong>3. NLP与大模型</strong></h3><ul>
-<li><strong>学习内容</strong>：文本处理、Transformer架构、BERT&#x2F;GPT模型、Hugging Face库。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>书籍</strong>：《自然语言处理综论》（Daniel Jurafsky）、《动手学深度学习》（李沐）。</li>
-<li><strong>课程</strong>：Hugging Face <a target="_blank" rel="noopener" href="https://huggingface.co/learn">NLP Course</a>、Stanford CS224N（B站有中文字幕）。</li>
-<li><strong>实战</strong>：使用Hugging Face Transformers库复现论文模型，参与NLP竞赛（如Kaggle）。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="4-Docker与部署"><a href="#4-Docker与部署" class="headerlink" title="4. Docker与部署"></a><strong>4. Docker与部署</strong></h3><ul>
-<li><strong>学习内容</strong>：容器化原理、镜像构建、Docker Compose。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>文档</strong>：<a target="_blank" rel="noopener" href="https://docs.docker.com/">Docker官方文档</a>。</li>
-<li><strong>实战</strong>：将训练好的模型封装为Docker镜像并部署到云服务器。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="5-数据库与SQL"><a href="#5-数据库与SQL" class="headerlink" title="5. 数据库与SQL"></a><strong>5. 数据库与SQL</strong></h3><ul>
-<li><strong>学习内容</strong>：SQL语法、数据库设计（MySQL&#x2F;PostgreSQL）、NoSQL基础。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>课程</strong>：Coursera <a target="_blank" rel="noopener" href="https://www.coursera.org/learn/sql-for-data-science">SQL for Data Science</a>。</li>
-<li><strong>练习</strong>：LeetCode数据库题目、模拟业务场景设计表结构。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="6-数据治理与行业知识"><a href="#6-数据治理与行业知识" class="headerlink" title="6. 数据治理与行业知识"></a><strong>6. 数据治理与行业知识</strong></h3><ul>
-<li><strong>学习内容</strong>：数据清洗、数据质量管理、制造业数据特点。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>书籍</strong>：《数据治理：工业企业数字化转型之道》。</li>
-<li><strong>行业报告</strong>：阅读制造业AI应用案例（如工业4.0、预测性维护）。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="7-专利与项目管理"><a href="#7-专利与项目管理" class="headerlink" title="7. 专利与项目管理"></a><strong>7. 专利与项目管理</strong></h3><ul>
-<li><strong>学习内容</strong>：专利申请流程、技术文档撰写、敏捷开发、PMP基础。</li>
-<li><strong>推荐资源</strong>：<ul>
-<li><strong>专利</strong>：国家知识产权局公开课、《专利审查指南》。</li>
-<li><strong>项目管理</strong>：Coursera <a target="_blank" rel="noopener" href="https://www.coursera.org/professional-certificates/google-project-management">Google Project Management</a>（含PMP备考内容）。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="8-软技能"><a href="#8-软技能" class="headerlink" title="8. 软技能"></a><strong>8. 软技能</strong></h3><ul>
-<li><strong>PPT制作</strong>：学习《用图表说话》（Gene Zelazny），模仿大厂技术分享PPT。</li>
-<li><strong>沟通协作</strong>：参与开源项目或团队项目，锻炼协作能力。</li>
-</ul>
-<hr>
-<h3 id="学习路径建议"><a href="#学习路径建议" class="headerlink" title="学习路径建议"></a><strong>学习路径建议</strong></h3><ol>
-<li><strong>基础阶段</strong>（1-3个月）：Python + 机器学习理论 + SQL。  </li>
-<li><strong>进阶阶段</strong>（3-6个月）：深度学习框架 + NLP + Docker + 实战项目。  </li>
-<li><strong>综合阶段</strong>（6个月+）：行业知识 + 专利&#x2F;项目管理 + 求职冲刺（优化简历和项目经历）。</li>
-</ol>
-<p>通过系统学习与项目实践（如Kaggle竞赛、GitHub开源贡献），逐步满足岗位要求。</p>
 
                 
               </div>
@@ -388,11 +339,50 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java/" class="category-chain-item">java</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/java/redis/" class="category-chain-item">redis</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/java/redis/%E5%AE%9E%E7%94%A8%E6%93%8D%E4%BD%9C/" class="category-chain-item">实用操作</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
   
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/AI/" class="print-no-link">#AI</a>
+        <a href="/tags/java/" class="print-no-link">#java</a>
+      
+        <a href="/tags/redis/" class="print-no-link">#redis</a>
+      
+        <a href="/tags/%E5%AE%9E%E7%94%A8%E6%93%8D%E4%BD%9C/" class="print-no-link">#实用操作</a>
       
     </div>
   
@@ -404,8 +394,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>AI工程师学习计划</div>
-      <div>http://yaoliyc.github.io/2025/02/25/AI工程师学习计划/</div>
+      <div>关于mysql做距离筛选的两种方法</div>
+      <div>http://yaoliyc.github.io/2025/04/15/关于mysql做距离筛选的两种方法 - 降温了 - 博客园/</div>
     </div>
     <div class="license-meta">
       
@@ -417,7 +407,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年2月25日</div>
+          <div>2025年4月15日</div>
         </div>
       
       
@@ -449,18 +439,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/" title="用好大模型?这5种实用的Prompt框架你一定要看看">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">用好大模型?这5种实用的Prompt框架你一定要看看</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案">
-                        <span class="hidden-mobile">Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</span>
+                      <a href="/2025/04/15/%E7%BB%8F%E7%BA%AC%E5%BA%A6%E8%AE%A1%E7%AE%97%E8%B7%9D%E7%A6%BB%20%20Mophei&#39;s%20blog/" title="经纬度计算距离">
+                        <span class="hidden-mobile">经纬度计算距离</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
