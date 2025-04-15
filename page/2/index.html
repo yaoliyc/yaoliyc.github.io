@@ -30,6 +30,8 @@
 <meta name="twitter:card" content="summary_large_image">
   
   
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
   
   <title>读书笔记</title>
 
@@ -63,7 +65,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -73,6 +75,31 @@
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
   
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
 
 
   
@@ -89,7 +116,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Fluid</strong>
+      <strong>读书笔记 </strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -229,6 +256,405 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/02/14/%E9%80%86%E5%90%91%E8%BF%9B%E9%98%B6%EF%BC%8C%E5%88%A9%E7%94%A8-AST-%E6%8A%80%E6%9C%AF%E8%BF%98%E5%8E%9F-JavaScript-%E6%B7%B7%E6%B7%86%E4%BB%A3%E7%A0%81/" target="_self">
+          逆向进阶，利用 AST 技术还原 JavaScript 混淆代码
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/%E9%80%86%E5%90%91%E8%BF%9B%E9%98%B6%EF%BC%8C%E5%88%A9%E7%94%A8-AST-%E6%8A%80%E6%9C%AF%E8%BF%98%E5%8E%9F-JavaScript-%E6%B7%B7%E6%B7%86%E4%BB%A3%E7%A0%81/" target="_self">
+        <div>
+          逆向进阶，利用 AST 技术还原 JavaScript 混淆代码 Excerpt什么是 AST AST（Abstract Syntax Tree），中文抽象语法树，简称语法树（Syntax Tree），是源代码的抽象语法结构的树状表现形式，树上的每个节点都表示源代码中的一种结构。语法树不是某一种编程语言独有的，JavaScript、Python、Java、Golang 等几乎所    什么是 AS
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 10:29" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/AST/">#AST</a>
+            
+              <a href="/tags/JavaScript/">#JavaScript</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/14/%E7%88%AC%E8%99%AB%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80%EF%BC%8C%E7%90%86%E8%A7%A3-JavaScript-%E6%A8%A1%E5%9D%97%E5%8C%96%E7%BC%96%E7%A8%8B-webpack/" target="_self">
+          爬虫逆向基础，理解 JavaScript 模块化编程 webpack
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/%E7%88%AC%E8%99%AB%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80%EF%BC%8C%E7%90%86%E8%A7%A3-JavaScript-%E6%A8%A1%E5%9D%97%E5%8C%96%E7%BC%96%E7%A8%8B-webpack/" target="_self">
+        <div>
+          爬虫逆向基础，理解 JavaScript 模块化编程 webpack Excerpt关注微信公众号：K哥爬虫，QQ交流群：808574309，持续分享爬虫进阶、JS&#x2F;安卓逆向等技术干货！ 简介 在分析一些站点的 JavaScript 代码时，比较简单的代码，函数通常都是一个一个的，例如： function a()  function b() {c     关注微信公众号：K哥爬虫，QQ交
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 10:24" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/webpack/">#webpack</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/" target="_self">
+          JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/" target="_self">
+        <div>
+          JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！ ExcerptJS 逆向中什么是 Hook？吃着火锅唱着歌，突然就被麻匪劫了！这就是 Hook！    点击上方「蓝字」关注我们   什么是 Hook？Hook 中文译为钩子，Hook 实际上是 Windows 中提供的一种用以替换 DOS 下“中断”的系统机制，Hook 的概念在 Windows 桌面软件开发很常见，特别是各种事件触发的
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 10:01" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/hook/">#hook</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/14/%E3%80%90%E7%88%AC%E8%99%AB%E7%9F%A5%E8%AF%86%E3%80%91%E6%B5%8F%E8%A7%88%E5%99%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7%E6%80%BB%E7%BB%93/" target="_self">
+          【爬虫知识】浏览器开发者工具使用技巧总结
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/%E3%80%90%E7%88%AC%E8%99%AB%E7%9F%A5%E8%AF%86%E3%80%91%E6%B5%8F%E8%A7%88%E5%99%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7%E6%80%BB%E7%BB%93/" target="_self">
+        <div>
+          【爬虫知识】浏览器开发者工具使用技巧总结 - K哥爬虫 - 博客园 Excerpt总览 浏览器开发者工具在爬虫中常用来进行简单的抓包分析、JS逆向调试，打开方式： F12； 快捷键 Ctrl+Shift+I； 鼠标右键检查或者审查元素； 浏览器右上角 —&gt; 更多工具 —&gt; 开发者工具 常见禁用开发者工具手段：https://blog.csdn.net/cplvfx/article
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 09:58" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/%E6%B5%8F%E8%A7%88%E5%99%A8/">#浏览器</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/14/%E3%80%90%E7%88%AC%E8%99%AB%E7%9F%A5%E8%AF%86%E3%80%91%E7%88%AC%E8%99%AB%E5%B8%B8%E8%A7%81%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E7%AE%97%E6%B3%95-K%E5%93%A5%E7%88%AC%E8%99%AB-%E5%8D%9A%E5%AE%A2%E5%9B%AD/" target="_self">
+          【爬虫知识】爬虫常见加密解密算法
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/%E3%80%90%E7%88%AC%E8%99%AB%E7%9F%A5%E8%AF%86%E3%80%91%E7%88%AC%E8%99%AB%E5%B8%B8%E8%A7%81%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E7%AE%97%E6%B3%95-K%E5%93%A5%E7%88%AC%E8%99%AB-%E5%8D%9A%E5%AE%A2%E5%9B%AD/" target="_self">
+        <div>
+          【爬虫知识】爬虫常见加密解密算法 Excerpt简介 本文总结了在爬虫中常见的各种加密算法、编码算法的原理、在 JavaScript 中和 Python 中的基本实现方法，遇到 JS 加密的时候可以快速还原加密过程，有的网站在加密的过程中可能还经过了其他处理，但是大致的方法是一样的。 常见加密算法： 对称加密（加密解密密钥相同）：DES、3DES    简介#本文总结了在爬虫中常见的各种加密算法、
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 09:54" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/%E5%8A%A0%E5%AF%86/">#加密</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/14/%E7%88%AC%E8%99%AB%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%AE%A4%E8%AF%86-SM1-SM9%E3%80%81ZUC-%E5%9B%BD%E5%AF%86%E7%AE%97%E6%B3%95/" target="_self">
+          爬虫逆向基础，认识 SM1-SM9、ZUC 国密算法
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/14/%E7%88%AC%E8%99%AB%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%AE%A4%E8%AF%86-SM1-SM9%E3%80%81ZUC-%E5%9B%BD%E5%AF%86%E7%AE%97%E6%B3%95/" target="_self">
+        <div>
+          爬虫逆向基础，认识 SM1-SM9、ZUC 国密算法 - K哥爬虫 - 博客园 Excerpt关注微信公众号：K哥爬虫，QQ交流群：808574309，持续分享爬虫进阶、JS&#x2F;安卓逆向等技术干货！ 【01x00】 简介 国密即国家密码局认定的国产加密算法，爬虫工程师在做 JS 逆向的时候，会遇到各种各样的加密算法，其中 RSA、AES、SHA 等算法是最常见的，这些算法都是国外的，在 K
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-14 09:48" pubdate>
+              2025-02-14
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
+            
+              <a href="/tags/%E5%8A%A0%E5%AF%86/">#加密</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/02/13/%E7%94%A8java-imageio%E8%B0%83%E6%95%B4%E5%9B%BE%E7%89%87DPI%EF%BC%8C%E4%BE%8B%E5%A6%82%E4%BB%8E96%E8%B0%83%E6%95%B4%E4%B8%BA300/" target="_self">
+          用java imageio调整图片DPI，例如从96调整为300
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/02/13/%E7%94%A8java-imageio%E8%B0%83%E6%95%B4%E5%9B%BE%E7%89%87DPI%EF%BC%8C%E4%BE%8B%E5%A6%82%E4%BB%8E96%E8%B0%83%E6%95%B4%E4%B8%BA300/" target="_self">
+        <div>
+          用java imageio调整图片DPI，例如从96调整为300 - 古语云 - 博客园 Excerpt因项目需求把图片的DPI值提升到300，否则OCR识别产生错乱：直接上源码：1、图片处理接口： 2、JEPG图片的实现类 3、PNG图片的实现类   package util.image.dpi; import java.awt.image.BufferedImage; import java.
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-02-13 16:01" pubdate>
+              2025-02-13
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java/">#java</a>
+            
+              <a href="/tags/dpi/">#dpi</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/02/13/%E4%BD%BF%E7%94%A8-Java-%E6%8A%8A-RGB-%E8%BD%AC%E4%B8%BA-CMYK/" target="_self">
           使用 Java 把 RGB 转为 CMYK
         </a>
@@ -250,6 +676,27 @@
             </time>
           </div>
         
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java/" class="category-chain-item">java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
         
         
           <div class="post-meta">
@@ -294,6 +741,27 @@
             </time>
           </div>
         
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java/" class="category-chain-item">java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
         
         
           <div class="post-meta">
@@ -367,6 +835,32 @@
     </div>
   
   
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
   
 </div>
 
@@ -418,6 +912,8 @@
 
 
   <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
 
 
 
