@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>Mysql实现按距离排序、范围查找</title>
+    <link href="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/"/>
+    <url>/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Mysql实现按距离排序、范围查找"><a href="#Mysql实现按距离排序、范围查找" class="headerlink" title="Mysql实现按距离排序、范围查找"></a>Mysql实现按距离排序、范围查找</h1><p>现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。</p><h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>实现过程主要分为四步：   </p><ol><li>搜索 <br>在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。   </li><li>过滤 <br>搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。   </li><li>排序 <br>距离由近到远排序。如果不需要，可以跳过。   </li><li>分页 <br>如果需要2、3步，才需要对分页特殊处理。如果不需要，可以在第1步直接SQL分页。</li></ol><p>第1步数据库完成，后3步应用程序完成。</p><p>为了方便下面说明，先给出一个初始表结构，我使用的是MySQL：</p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png"></p><h2 id="step1-搜索"><a href="#step1-搜索" class="headerlink" title="step1 搜索"></a>step1 搜索</h2><p>搜索可以用下面两种方式来实现。</p><h3 id="区间查找"><a href="#区间查找" class="headerlink" title="区间查找"></a>区间查找</h3><p>customer表中使用两个字段存储了经度和纬度，如果提前计算出经纬度的范围，然后在这两个字段上加上索引，那搜索性能会很不错。 <br>那怎么计算出经纬度的范围呢？已知条件是移动设备所在的经纬度，还有满足业务要求的半径，这很像初中的一道平面几何题：给定圆心坐标和半径，求该圆外切正方形四个顶点的坐标。而我们面对的是一个球体，可以使用<a href="https://github.com/locationtech/spatial4j">spatial4j</a>来计算。</p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180905021-1403485682.png"></p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180929615-603715276.png"></p><p>geohash的原理不讲了，详细可以看<a href="http://www.cnblogs.com/LBSer/p/3310455.html">这篇文章</a>，讲的很详细。geohash算法能把二维的经纬度编码成一维的字符串，它的特点是越相近的经纬度编码后越相似，所以可以通过前缀like的方式去匹配周围的商户。 <br>customer表要增加一个字段，来存储每个商户的geohash编码，并且建立索引。</p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180956037-674314141.png"></p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181016802-1620997722.png"></p><p> <img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181042615-564048244.png"></p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181202224-1107522791.png"></p><p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181224537-190479827.png"></p><h2 id="step3-排序"><a href="#step3-排序" class="headerlink" title="step3 排序"></a>step3 排序</h2><p>同样，排序也需要在应用程序中处理。排序基于上面的过滤结果做就可以了<code>Collections.sort(list, comparator)</code>。</p><h2 id="step4-分页"><a href="#step4-分页" class="headerlink" title="step4 分页"></a>step4 分页</h2><p>如果需要2、3步，只能在内存中分页，做法也很简单，可以参考<a href="http://blog.csdn.net/ghsau/article/details/7243540">这篇文章</a>。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>全文的重点都在于搜索如何实现，更好的利用数据库的索引，两种搜索方式以百万数据量为分割线，第一种适用于百万以下，第二种适用于百万以上，<code>未经过严格验证</code>。可能有人会有疑问，过滤和排序都在应用层做，内存占用会不会很严重？这是个潜在问题，但大多数情况下不会。看我们大部分的应用场景，都是单一种类POI(Point Of Interest)的搜索，如酒店、美食、KTV、电影院等等，这种数据密度是很小，1公里内的酒店，能有多少家，50家都算多的，所以最终要看具体业务数据密度。本文没有分析原理，只讲了具体实现，有关分析的文章可以看参考链接。</p><hr><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.infoq.com/cn/articles/depth-study-of-Symfony2">http://www.infoq.com/cn/articles/depth-study-of-Symfony2</a> <br><a href="http://tech.meituan.com/lucene-distance.html">http://tech.meituan.com/lucene-distance.html</a> <br><a href="http://blog.csdn.net/liminlu0314/article/details/8553926">http://blog.csdn.net/liminlu0314/article/details/8553926</a> <br><a href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates</a> <br><a href="http://www.cnblogs.com/LBSer/p/3310455.html">http://www.cnblogs.com/LBSer/p/3310455.html</a> <br><a href="http://cevin.net/geohash/">http://cevin.net/geohash/</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>mysql</category>
+      
+      <category>spatial4j</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>mysql</tag>
+      
+      <tag>spatial4j</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>关于mysql做距离筛选的两种方法</title>
     <link href="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/"/>
     <url>/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/</url>

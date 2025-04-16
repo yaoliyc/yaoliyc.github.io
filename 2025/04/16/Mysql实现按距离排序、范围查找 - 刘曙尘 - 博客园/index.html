@@ -19,29 +19,34 @@
   <meta name="author" content="屹">
   <meta name="keywords" content="">
   
-    <meta name="description" content="关于mysql做距离筛选的两种方法 - 降温了 - 博客园使用mysql自带的函数计算距离作为筛选条件 这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死  12345678&#x2F;***  @param :lat 纬度*  @param :lon 经度*  @param :dis 距离范围**&#x2F;SELECT a.*,ROUND(6378.138 * 2 * A">
+    <meta name="description" content="Mysql实现按距离排序、范围查找现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。 实现实现过程主要分为四步：     搜索 在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。    过滤 搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于mysql做距离筛选的两种方法">
-<meta property="og:url" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/index.html">
+<meta property="og:title" content="Mysql实现按距离排序、范围查找">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/index.html">
 <meta property="og:site_name" content="读书笔记">
-<meta property="og:description" content="关于mysql做距离筛选的两种方法 - 降温了 - 博客园使用mysql自带的函数计算距离作为筛选条件 这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死  12345678&#x2F;***  @param :lat 纬度*  @param :lon 经度*  @param :dis 距离范围**&#x2F;SELECT a.*,ROUND(6378.138 * 2 * A">
+<meta property="og:description" content="Mysql实现按距离排序、范围查找现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。 实现实现过程主要分为四步：     搜索 在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。    过滤 搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png">
-<meta property="og:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325151107218-966233511.png">
-<meta property="article:published_time" content="2025-04-15T08:16:15.000Z">
-<meta property="article:modified_time" content="2025-04-15T08:22:21.230Z">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180905021-1403485682.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180929615-603715276.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180956037-674314141.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181016802-1620997722.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181042615-564048244.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181202224-1107522791.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181224537-190479827.png">
+<meta property="article:published_time" content="2025-04-16T02:11:34.000Z">
+<meta property="article:modified_time" content="2025-04-16T06:41:55.592Z">
 <meta property="article:author" content="屹">
-<meta property="article:tag" content="java">
-<meta property="article:tag" content="redis">
-<meta property="article:tag" content="实用操作">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="spatial4j">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://yaoliyc.github.io/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>关于mysql做距离筛选的两种方法 - 读书笔记</title>
+  <title>Mysql实现按距离排序、范围查找 - 读书笔记</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -232,7 +237,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="关于mysql做距离筛选的两种方法"></span>
+            <span id="subtitle" data-typed-text="Mysql实现按距离排序、范围查找"></span>
           
         </div>
 
@@ -243,8 +248,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-04-15 16:16" pubdate>
-          2025年4月15日 下午
+        <time datetime="2025-04-16 10:11" pubdate>
+          2025年4月16日 上午
         </time>
       </span>
     
@@ -255,7 +260,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          445 字
+          855 字
         
       </span>
     
@@ -266,7 +271,7 @@
         
         
         
-          4 分钟
+          8 分钟
         
       </span>
     
@@ -303,34 +308,37 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">关于mysql做距离筛选的两种方法</h1>
+            <h1 id="seo-header">Mysql实现按距离排序、范围查找</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="关于mysql做距离筛选的两种方法-降温了-博客园"><a href="#关于mysql做距离筛选的两种方法-降温了-博客园" class="headerlink" title="关于mysql做距离筛选的两种方法 - 降温了 - 博客园"></a>关于mysql做距离筛选的两种方法 - 降温了 - 博客园</h1><h2 id="使用mysql自带的函数计算距离作为筛选条件"><a href="#使用mysql自带的函数计算距离作为筛选条件" class="headerlink" title="使用mysql自带的函数计算距离作为筛选条件"></a>使用mysql自带的函数计算距离作为筛选条件</h2><ul>
-<li>这种方式是网上比较常见的，缺点很明显，不能使用索引，查询非常的慢，几万条数据量查询都慢的要死</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">/**</span><br><span class="hljs-comment">*  @param :lat 纬度</span><br><span class="hljs-comment">*  @param :lon 经度</span><br><span class="hljs-comment">*  @param :dis 距离范围</span><br><span class="hljs-comment">**/</span><br><span class="hljs-keyword">SELECT</span> a.<span class="hljs-operator">*</span>,ROUND(<span class="hljs-number">6378.138</span> <span class="hljs-operator">*</span> <span class="hljs-number">2</span> <span class="hljs-operator">*</span> <span class="hljs-built_in">ASIN</span>(<span class="hljs-built_in">SQRT</span>(POW(<span class="hljs-built_in">SIN</span>((:lat <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span> <span class="hljs-operator">-</span> a.latitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">/</span> <span class="hljs-number">2</span>), <span class="hljs-number">2</span>) <span class="hljs-operator">+</span> <span class="hljs-built_in">COS</span>(:lat <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">*</span> <span class="hljs-built_in">COS</span>(a.latitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">*</span> POW(<span class="hljs-built_in">SIN</span>((:lon <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span> <span class="hljs-operator">-</span> a.longitude <span class="hljs-operator">*</span> PI() <span class="hljs-operator">/</span> <span class="hljs-number">180</span>) <span class="hljs-operator">/</span> <span class="hljs-number">2</span>), <span class="hljs-number">2</span>))) <span class="hljs-operator">*</span> <span class="hljs-number">1000</span>) <span class="hljs-keyword">AS</span> distance <span class="hljs-keyword">FROM</span> maoyan_cinema a <span class="hljs-keyword">WHERE</span> a.del_flag <span class="hljs-operator">=</span> <span class="hljs-number">0</span> <span class="hljs-keyword">HAVING</span> distance <span class="hljs-operator">&lt;</span> :dis <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> distance <span class="hljs-keyword">ASC</span><br><br><br></code></pre></td></tr></table></figure>
-
-<h2 id="使用redis计算距离"><a href="#使用redis计算距离" class="headerlink" title="使用redis计算距离"></a>使用redis计算距离</h2><ul>
-<li>先将数据库里的数据全部导入到redis（经纬度和主键）即可</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//导入到redis部分代码</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">syncGeo</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">//查询经度纬度主键id保存在list</span><br>        List&lt;Object[]&gt; list = xxx.getStationPoint();<br>        <span class="hljs-keyword">if</span> (CollectionUtils.isEmpty(list) || list.size() &lt; <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        Map&lt;Long, Point&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;(hashMapInitialCapacity);<br>        <span class="hljs-keyword">for</span> (Object[] o : list) &#123;<br>            map.put(Long.parseLong(o[<span class="hljs-number">0</span>].toString()), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(Double.parseDouble(o[<span class="hljs-number">2</span>].toString()), Double.parseDouble(o[<span class="hljs-number">1</span>].toString())));<br>        &#125;<br>        <span class="hljs-type">GeoOperations</span> <span class="hljs-variable">geoOperations</span> <span class="hljs-operator">=</span> redisTemplate.opsForGeo();<br>        <span class="hljs-type">Long</span> <span class="hljs-variable">stations</span> <span class="hljs-operator">=</span> geoOperations.geoAdd(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, map);<br>        redisTemplate.expire(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, <span class="hljs-number">2</span>, TimeUnit.DAYS);<br>    &#125;<br><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><p>保存完后在redis可视化工具可以看到<br>  <img src="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325154323367-42656464.png" srcset="/img/loading.gif" lazyload></p>
-</li>
-<li><p>也可以使用命令行查看其中的某条记录<br>  <img src="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/2169095-20220325151107218-966233511.png" srcset="/img/loading.gif" lazyload></p>
-</li>
-<li><p>geo计算满足距离范围内主键id列表</p>
-</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Circle</span> <span class="hljs-variable">circle</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Circle</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(<span class="hljs-string">&quot;入参经度&quot;</span>, <span class="hljs-string">&quot;入参纬度&quot;</span>), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Distance</span>(<span class="hljs-string">&quot;距离范围&quot;</span>, Metrics.KILOMETERS));<br> <span class="hljs-comment">//这里限制1w条，可根据实际业务确定需要多少条数据</span><br> RedisGeoCommands.<span class="hljs-type">GeoRadiusCommandArgs</span> <span class="hljs-variable">args</span> <span class="hljs-operator">=</span> RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending().limit(<span class="hljs-number">10000</span>);<br> GeoResults&lt;RedisGeoCommands.GeoLocation&lt;Integer&gt;&gt; results = geoOperations.geoRadius(<span class="hljs-string">&quot;redisKeyGeo&quot;</span>, circle, args);<br> Map&lt;Long, Double&gt; stationIdsAndDistance = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashMap</span>&lt;&gt;();<br> List&lt;GeoResult&lt;RedisGeoCommands.GeoLocation&lt;Integer&gt;&gt;&gt; content = results.getContent();<br><br></code></pre></td></tr></table></figure>
-
-<ul>
-<li>得到范围内的所有主键id,再使用mysql进行各种条件筛选。这种方式可以用到索引，测试geo计算距离也很快，只需要几毫秒</li>
-</ul>
+                <h1 id="Mysql实现按距离排序、范围查找"><a href="#Mysql实现按距离排序、范围查找" class="headerlink" title="Mysql实现按距离排序、范围查找"></a>Mysql实现按距离排序、范围查找</h1><p>现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>实现过程主要分为四步：   </p>
+<ol>
+<li>搜索 <br>在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。   </li>
+<li>过滤 <br>搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。   </li>
+<li>排序 <br>距离由近到远排序。如果不需要，可以跳过。   </li>
+<li>分页 <br>如果需要2、3步，才需要对分页特殊处理。如果不需要，可以在第1步直接SQL分页。</li>
+</ol>
+<p>第1步数据库完成，后3步应用程序完成。</p>
+<p>为了方便下面说明，先给出一个初始表结构，我使用的是MySQL：</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="step1-搜索"><a href="#step1-搜索" class="headerlink" title="step1 搜索"></a>step1 搜索</h2><p>搜索可以用下面两种方式来实现。</p>
+<h3 id="区间查找"><a href="#区间查找" class="headerlink" title="区间查找"></a>区间查找</h3><p>customer表中使用两个字段存储了经度和纬度，如果提前计算出经纬度的范围，然后在这两个字段上加上索引，那搜索性能会很不错。 <br>那怎么计算出经纬度的范围呢？已知条件是移动设备所在的经纬度，还有满足业务要求的半径，这很像初中的一道平面几何题：给定圆心坐标和半径，求该圆外切正方形四个顶点的坐标。而我们面对的是一个球体，可以使用<a target="_blank" rel="noopener" href="https://github.com/locationtech/spatial4j">spatial4j</a>来计算。</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180905021-1403485682.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180929615-603715276.png" srcset="/img/loading.gif" lazyload></p>
+<p>geohash的原理不讲了，详细可以看<a target="_blank" rel="noopener" href="http://www.cnblogs.com/LBSer/p/3310455.html">这篇文章</a>，讲的很详细。geohash算法能把二维的经纬度编码成一维的字符串，它的特点是越相近的经纬度编码后越相似，所以可以通过前缀like的方式去匹配周围的商户。 <br>customer表要增加一个字段，来存储每个商户的geohash编码，并且建立索引。</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180956037-674314141.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181016802-1620997722.png" srcset="/img/loading.gif" lazyload></p>
+<p> <img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181042615-564048244.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181202224-1107522791.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181224537-190479827.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="step3-排序"><a href="#step3-排序" class="headerlink" title="step3 排序"></a>step3 排序</h2><p>同样，排序也需要在应用程序中处理。排序基于上面的过滤结果做就可以了<code>Collections.sort(list, comparator)</code>。</p>
+<h2 id="step4-分页"><a href="#step4-分页" class="headerlink" title="step4 分页"></a>step4 分页</h2><p>如果需要2、3步，只能在内存中分页，做法也很简单，可以参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/ghsau/article/details/7243540">这篇文章</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>全文的重点都在于搜索如何实现，更好的利用数据库的索引，两种搜索方式以百万数据量为分割线，第一种适用于百万以下，第二种适用于百万以上，<code>未经过严格验证</code>。可能有人会有疑问，过滤和排序都在应用层做，内存占用会不会很严重？这是个潜在问题，但大多数情况下不会。看我们大部分的应用场景，都是单一种类POI(Point Of Interest)的搜索，如酒店、美食、KTV、电影院等等，这种数据密度是很小，1公里内的酒店，能有多少家，50家都算多的，所以最终要看具体业务数据密度。本文没有分析原理，只讲了具体实现，有关分析的文章可以看参考链接。</p>
+<hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="http://www.infoq.com/cn/articles/depth-study-of-Symfony2">http://www.infoq.com/cn/articles/depth-study-of-Symfony2</a> <br><a target="_blank" rel="noopener" href="http://tech.meituan.com/lucene-distance.html">http://tech.meituan.com/lucene-distance.html</a> <br><a target="_blank" rel="noopener" href="http://blog.csdn.net/liminlu0314/article/details/8553926">http://blog.csdn.net/liminlu0314/article/details/8553926</a> <br><a target="_blank" rel="noopener" href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates</a> <br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/LBSer/p/3310455.html">http://www.cnblogs.com/LBSer/p/3310455.html</a> <br><a target="_blank" rel="noopener" href="http://cevin.net/geohash/">http://cevin.net/geohash/</a></p>
 
                 
               </div>
@@ -349,20 +357,13 @@
     
       <span class="category-chain">
         
-  <a href="/categories/java/" class="category-chain-item">java</a>
+  <a href="/categories/mysql/" class="category-chain-item">mysql</a>
   
   
     <span>></span>
     
-  <a href="/categories/java/redis/" class="category-chain-item">redis</a>
+  <a href="/categories/mysql/spatial4j/" class="category-chain-item">spatial4j</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/java/redis/%E5%AE%9E%E7%94%A8%E6%93%8D%E4%BD%9C/" class="category-chain-item">实用操作</a>
-  
-  
-
   
 
   
@@ -378,11 +379,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/java/" class="print-no-link">#java</a>
+        <a href="/tags/mysql/" class="print-no-link">#mysql</a>
       
-        <a href="/tags/redis/" class="print-no-link">#redis</a>
-      
-        <a href="/tags/%E5%AE%9E%E7%94%A8%E6%93%8D%E4%BD%9C/" class="print-no-link">#实用操作</a>
+        <a href="/tags/spatial4j/" class="print-no-link">#spatial4j</a>
       
     </div>
   
@@ -394,8 +393,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>关于mysql做距离筛选的两种方法</div>
-      <div>http://yaoliyc.github.io/2025/04/15/关于mysql做距离筛选的两种方法 - 降温了 - 博客园/</div>
+      <div>Mysql实现按距离排序、范围查找</div>
+      <div>http://yaoliyc.github.io/2025/04/16/Mysql实现按距离排序、范围查找 - 刘曙尘 - 博客园/</div>
     </div>
     <div class="license-meta">
       
@@ -407,7 +406,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年4月15日</div>
+          <div>2025年4月16日</div>
         </div>
       
       
@@ -439,18 +438,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/" title="Mysql实现按距离排序、范围查找">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Mysql实现按距离排序、范围查找</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/04/15/%E7%BB%8F%E7%BA%AC%E5%BA%A6%E8%AE%A1%E7%AE%97%E8%B7%9D%E7%A6%BB%20%20Mophei&#39;s%20blog/" title="经纬度计算距离">
-                        <span class="hidden-mobile">经纬度计算距离</span>
+                      <a href="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/" title="关于mysql做距离筛选的两种方法">
+                        <span class="hidden-mobile">关于mysql做距离筛选的两种方法</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
