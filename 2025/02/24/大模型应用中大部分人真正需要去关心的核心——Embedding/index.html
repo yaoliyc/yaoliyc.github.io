@@ -1,0 +1,904 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="大模型应用中大部分人真正需要去关心的核心——Embedding Excerpt对于大部分人，在大模型的各类技术中，你最应该关注的是embedding，应为这是基于大模型应用的核心组件之一，甚至是最重要的组件。    本文你大概会看到以下内容：  大模型的主要应用场景  主流中文embedding模型  embedding的技术原理  几种语义相似度算法  在生产环境中使用embedding的案例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型应用中大部分人真正需要去关心的核心——Embedding">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="大模型应用中大部分人真正需要去关心的核心——Embedding Excerpt对于大部分人，在大模型的各类技术中，你最应该关注的是embedding，应为这是基于大模型应用的核心组件之一，甚至是最重要的组件。    本文你大概会看到以下内容：  大模型的主要应用场景  主流中文embedding模型  embedding的技术原理  几种语义相似度算法  在生产环境中使用embedding的案例">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.1.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.2.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.3.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.4.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.5.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.6.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.7.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.8.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.9.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.10.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.11.webp">
+<meta property="article:published_time" content="2025-02-24T01:29:33.000Z">
+<meta property="article:modified_time" content="2025-03-02T08:58:31.681Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Embedding">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>大模型应用中大部分人真正需要去关心的核心——Embedding - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="大模型应用中大部分人真正需要去关心的核心——Embedding"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-24 09:29" pubdate>
+          2025年2月24日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          45 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">大模型应用中大部分人真正需要去关心的核心——Embedding</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="大模型应用中大部分人真正需要去关心的核心——Embedding"><a href="#大模型应用中大部分人真正需要去关心的核心——Embedding" class="headerlink" title="大模型应用中大部分人真正需要去关心的核心——Embedding"></a>大模型应用中大部分人真正需要去关心的核心——Embedding</h1><blockquote>
+<h2 id="Excerpt"><a href="#Excerpt" class="headerlink" title="Excerpt"></a>Excerpt</h2><p>对于大部分人，在大模型的各类技术中，你最应该关注的是embedding，应为这是基于大模型应用的核心组件之一，甚至是最重要的组件。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>本文你大概会看到以下内容：</p>
+<ul>
+<li><p>大模型的主要应用场景</p>
+</li>
+<li><p>主流中文embedding模型</p>
+</li>
+<li><p>embedding的技术原理</p>
+</li>
+<li><p>几种语义相似度算法</p>
+</li>
+<li><p>在生产环境中使用embedding的案例</p>
+</li>
+</ul>
+</blockquote>
+<p>我们现在一说到大模型，往往说的就是ChatGPT、Llama，或者国产的ChatGLM、文心一言等等。但是，那些大模型一般只属于大厂，对于大部分人来说，我们更多的角色是大模型的使用者，或者是基于大模型来开发应用。</p>
+<p>大模型主要应用  </p>
+<p>目前如果是就文本方面，大模型应用主要聚焦在两类：  </p>
+<ul>
+<li><p><strong>问答（chat）机器人</strong>：这部分目前也是大模型最被人所知的应用，但chat功能我们已经有ChatGPT、Claude、文心一言、通义千问等一众产品可以用，对于大部分人来说，我们是消费者；  </p>
+</li>
+<li><p><strong>企业检索应用</strong>：企业应用中最常见的就是更高级的检索，我们可以一般叫它检索增强生成（RAG），这个场景在企业本地化应用中比较受欢迎，可以保护企业数据安全，又可以让企业借助AI提升生产效率。</p>
+</li>
+</ul>
+<p>而在企业检索应用中，我相信做过这一块应用的人都会遇到embedding的问题，你的embedding模型会直接影响检索和生成的效率，虽然它不是唯一的影响因素。</p>
+<p>主流中文embedding模型</p>
+<p>现在主流的中文embedding模型其实也不是太多，以下就是主要的embedding模型了，目前我们用的m3e，但效果感觉还有待提升。排名上看，BGE好像还比较不错。当然，包括像阿里的商用embedding模型也是不错的，1500+维的。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>本文我们从基础开始，了解一下向量Embeddings的人工智能搜索功能。使用的是Redis的功能，学习和创建模型。  </p>
+<p>以下文章内容参考了《Vector Embeddings: From the Basics to Production》<a target="_blank" rel="noopener" href="https://partee.io/2022/08/11/vector-embeddings/%EF%BC%8C%E8%8B%B1%E6%96%87%E5%A5%BD%E7%9A%84%E5%90%8C%E5%AD%A6%E4%B9%9F%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E7%9C%8B%E5%8E%9F%E6%96%87%E3%80%82">https://partee.io/2022/08/11/vector-embeddings/，英文好的同学也可以直接看原文。</a></p>
+<p>我去研究embedding的原因，是因为我们想自己研发一个适用于我们业务场景的embedding模型。  </p>
+<h2 id="向量Embedding"><a href="#向量Embedding" class="headerlink" title="向量Embedding"></a>向量Embedding</h2><p>什么是向量Embedding?简单地说，向量Embedding是可以表示许多类型数据的数字列表。</p>
+<p>向量Embedding非常灵活，包括音频、视频、文本和图像都可以表示为向量Embedding。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.1.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>从不同类型的数据创建向量Embedding的过程：音频，文本，视频。  </p>
+<p>为了解释为什么Embedding提供了这样的实用程序，让我们看一下以前处理文本数据(如表格数据中的分类值)的方法。数据科学家有时会使用one-hot编码等方法将分类特征转换为数值。这些编码将为每种类型的类别创建一个列。值为1表示项目属于该列指定的类别。相反，值为0表示项目不属于该类别。</p>
+<p>例如，考虑书籍类型:“小说”、“非小说”和“传记”。每一种体裁都可以编码成一个热向量，然而，这样的向量会非常稀疏，因为书籍通常只属于两个体裁。下图显示了这种编码是如何工作的。注意这里0的数量是1的两倍。对于像图书类型这样的类别，随着更多的类型被添加到数据集中，这种稀疏性将会呈指数级恶化。</p>
+<p>稀疏性会给机器学习模型带来挑战。对于每一种新的类型，编码表示的大小都会增长，因此数据集的计算成本会变得很高。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.2.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>One-hot（独热）编码示例  </p>
+<p>对于图书类型，或者任何具有相对较少类别的分类数据，我们可以使用简单的one-hot编码，但是，对于整个英语语言呢?对于这种规模的语料库，这种编码方法将变得不切实际。</p>
+<p><strong>进入向量Embedding</strong>。</p>
+<p>向量Embedding呈现固定大小的表示，不随数据中观测值的数量而增长。由模型创建的结果向量，通常是384个浮点值，比其他编码方法(如one-hot编码)的表示密度要高得多。这意味着在更少的字节中存在更多的信息，因此在计算上的利用成本更低。正如您稍后将读到的，这些密集表示可以用于多种目的，例如反向图像搜索、聊天机器人、问答和推荐系统。</p>
+<h2 id="创建向量Embedding"><a href="#创建向量Embedding" class="headerlink" title="创建向量Embedding"></a>创建向量Embedding</h2><p>为了理解向量Embedding是如何创建的，对现代深度学习模型的简要介绍是有帮助的。</p>
+<p>机器学习模型不使用非结构化数据。为了使模型能够理解文本或图像，我们必须将它们转换为数字表示。在机器学习之前，这样的表示通常是通过Feature Engineering“手工”创建的。</p>
+<p>随着深度学习的出现，复杂数据中的非线性特征交互是由模型学习而不是人工设计的。当一个输入遍历深度学习模型时，该输入数据的新表示将以不同的形状和大小创建。每一层通常关注输入的不同方面。深度学习的这一方面，从输入中“自动”生成特征表示，构成了如何创建向量Embedding的基础。</p>
+<p>例如，考虑在ImageNet数据集上训练的著名的ResNet模型。ResNet是一种卷积神经网络(CNN)，通常用于与图像相关的任务。在这种情况下，ResNet被训练来预测图像中的对象属于1000个类中的哪一个。</p>
+<p>在训练过程中，ResNet将捕获图像中存在的特征信息，通过将图像传递给多个卷积层、池化层和完全连接层。这些图层将捕获边缘、线条和角等特征，并将它们分组到传递给下一个图层的“桶”中。由于CNN的空间不变特性，无论边缘或直线出现在图像的哪个位置，这些特征都将始终映射到相同的桶。这些层将通过模型的层变得越来越小，直到一个由1000个浮点值组成的完全连接的层作为输出。每个值代表1000个类中的1个。该值越高，图像中的对象属于该类的概率就越大。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.3.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>简单卷积神经网络(CNN)示意图  </p>
+<p>ResNet和其他类似的图像分类模型回答了这个问题:“这个图像中是什么类型的对象?”然而，这些分类在回答诸如“哪些图像与此图像相似?”之类的prompts时用处不大。对于这个问题，我们需要一起比较图像。尽管没有专门针对这项任务进行训练，ResNet仍然很有用，因为它可以捕获图像的密集表示。</p>
+<p>简单地说，CNN和其他类似的模型学习有用的数据表示，以执行图像分类等任务。当输入通过模型的各个层时，可以提取这些表示。被提取的层，也称为潜在空间，通常是靠近模型输出的层。在上图中，这可能是包含768或500个隐藏单位的图层。提取的层或潜在空间提供了一个密集的表示，其中包含有关当前特征的信息，这对于视觉相似性搜索等任务在计算上是可行的。</p>
+<p>这是向量Embedding。</p>
+<p>存在大量的预训练模型，可以很容易地用于创建向量Embedding。Huggingface Model Hub (<a target="_blank" rel="noopener" href="https://huggingface.co/models)%E5%8C%85%E5%90%AB%E8%AE%B8%E5%A4%9A%E6%A8%A1%E5%9E%8B%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%B8%BA%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%88%9B%E5%BB%BAEmbedding%E3%80%82%E4%BE%8B%E5%A6%82%EF%BC%8Call-MiniLM-L6-v2%E6%A8%A1%E5%9E%8B%E6%98%AF%E5%9C%A8%E7%BA%BF%E6%89%98%E7%AE%A1%E5%92%8C%E8%BF%90%E8%A1%8C%E7%9A%84%EF%BC%8C%E4%B8%8D%E9%9C%80%E8%A6%81%E4%B8%93%E4%B8%9A%E7%9F%A5%E8%AF%86%E6%88%96%E5%AE%89%E8%A3%85%E3%80%82">https://huggingface.co/models)包含许多模型，可以为不同类型的数据创建Embedding。例如，all-MiniLM-L6-v2模型是在线托管和运行的，不需要专业知识或安装。</a></p>
+<p>像<code>sentence_transformers</code>这样的包，也来自HuggingFace，为语义相似度搜索、视觉搜索等任务提供了易于使用的模型。要使用这些模型创建Embeddings，只需要几行Python代码:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>sentence_transformers<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>model<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;sentence-transformers/all-MiniLM-L6-v2&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>sentences<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>very<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>Person&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>Happy<span class="hljs-symbol">&amp;nbsp;</span>Dog&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Today<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>sunny<span class="hljs-symbol">&amp;nbsp;</span>day&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>]<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>embeddings<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>model.encode(sentences)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="语义相似度搜索的向量Embedding"><a href="#语义相似度搜索的向量Embedding" class="headerlink" title="语义相似度搜索的向量Embedding"></a>语义相似度搜索的向量Embedding</h2><p>语义相似搜索是将文本片段进行比较，以找出包含最相似含义的文本的过程。虽然这对普通人来说似乎很容易，但语言是相当复杂的。将非结构化文本数据提炼成机器学习模型可以理解的格式一直是许多自然语言处理研究人员的研究主题。</p>
+<p>向量Embeddings为任何人提供了一种执行语义相似搜索的方法，而不仅仅是NLP研究人员或数据科学家。它们提供了一种有意义的、计算效率高的数字表示，可以通过预先训练的模型“开箱即用”来创建。下面是一个语义相似度的例子，它概述了用上面所示的<code>sentence_transformers</code>库创建的向量Embedding。</p>
+<p>让我们看看下面的句子:</p>
+<ul>
+<li><p>“That is a happy dog（那是一只快乐的狗）”</p>
+</li>
+<li><p>“That is a very happy person（那是一个非常幸福的人）”</p>
+</li>
+<li><p>“Today is a sunny day（今天是个晴天）”</p>
+</li>
+</ul>
+<p>这些句子中的每一个都可以转换成向量Embedding。下面是一个简化的表示，突出显示了这些示例句子在二维向量空间中相对于彼此的位置。这对于从视觉上衡量我们的Embedding如何有效地表示文本的语义意义非常有用。下文将详细介绍。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.4.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>向量Embeddings投影到二维的简化图  </p>
+<p>假设我们要将这些句子与“那是一个快乐的人”进行比较。首先，我们为查询语句创建向量Embedding。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>sentence_transformers<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>model<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;sentence-transformers/all-MiniLM-L6-v2&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>create<span class="hljs-symbol">&amp;nbsp;</span>the<span class="hljs-symbol">&amp;nbsp;</span>vector<span class="hljs-symbol">&amp;nbsp;</span>embedding<span class="hljs-symbol">&amp;nbsp;</span>for<span class="hljs-symbol">&amp;nbsp;</span>the<span class="hljs-symbol">&amp;nbsp;</span>query<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>query_embedding<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>model.encode(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>接下来，我们需要比较查询向量Embedding和数据集中的向量Embedding之间的距离。</p>
+<p>有很多方法可以计算向量之间的距离。当涉及到语义搜索时，每种方法都有自己的优点和缺点，但我们将在另一篇文章中讨论。下面显示了一些常见的距离度量。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.5.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>用于计算向量相似度的距离度量。  </p>
+<p>在这个例子中，我们将使用余弦相似度来度量两个向量的内积空间之间的距离。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.6.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>余弦相似度公式  </p>
+<p>在Python中，这看起来像</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>def<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>cosine_similarity<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>(a,<span class="hljs-symbol">&amp;nbsp;</span>b)<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>np.dot(a,<span class="hljs-symbol">&amp;nbsp;</span>b)/(norm(a)*norm(b))<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在我们的查询向量和上图中的其他三个向量之间运行这个计算，我们可以确定句子之间的相似程度。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.7.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>2D图显示了之前从我们的句子中创建的向量Embeddings之间的余弦相似性</p>
+<p>你可能已经猜到，“That is a very happy person（那是一个非常幸福的人）”和“That is a happy person（那是一个幸福的人）”是最相似的句子。这个例子只捕获了向量Embeddings的许多可能用例中的一个:<em>语义相似搜索</em></p>
+<p>下面列出了运行整个示例的Python代码</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>numpy<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>as<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>np<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>numpy.linalg<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>norm<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>sentence_transformers<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>Define<span class="hljs-symbol">&amp;nbsp;</span>the<span class="hljs-symbol">&amp;nbsp;</span>model<span class="hljs-symbol">&amp;nbsp;</span>we<span class="hljs-symbol">&amp;nbsp;</span>want<span class="hljs-symbol">&amp;nbsp;</span>to<span class="hljs-symbol">&amp;nbsp;</span>use<span class="hljs-symbol">&amp;nbsp;</span>(it&#x27;ll<span class="hljs-symbol">&amp;nbsp;</span>download<span class="hljs-symbol">&amp;nbsp;</span>itself)<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>model<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>SentenceTransformer(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;sentence-transformers/all-MiniLM-L6-v2&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>sentences<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>very<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>dog&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Today<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>sunny<span class="hljs-symbol">&amp;nbsp;</span>day&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>]<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>vector<span class="hljs-symbol">&amp;nbsp;</span>embeddings<span class="hljs-symbol">&amp;nbsp;</span>created<span class="hljs-symbol">&amp;nbsp;</span>from<span class="hljs-symbol">&amp;nbsp;</span>dataset<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>embeddings<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>model.encode(sentences)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>query<span class="hljs-symbol">&amp;nbsp;</span>vector<span class="hljs-symbol">&amp;nbsp;</span>embedding<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>query_embedding<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>model.encode(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>define<span class="hljs-symbol">&amp;nbsp;</span>our<span class="hljs-symbol">&amp;nbsp;</span>distance<span class="hljs-symbol">&amp;nbsp;</span>metric<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>def<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>cosine_similarity<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>(a,<span class="hljs-symbol">&amp;nbsp;</span>b)<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>np.dot(a,<span class="hljs-symbol">&amp;nbsp;</span>b)/(norm(a)*norm(b))<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>#<span class="hljs-symbol">&amp;nbsp;</span>run<span class="hljs-symbol">&amp;nbsp;</span>semantic<span class="hljs-symbol">&amp;nbsp;</span>similarity<span class="hljs-symbol">&amp;nbsp;</span>search<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>print(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Query:<span class="hljs-symbol">&amp;nbsp;</span>That<span class="hljs-symbol">&amp;nbsp;</span>is<span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>for<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>e,<span class="hljs-symbol">&amp;nbsp;</span>s<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>in<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>zip(embeddings,<span class="hljs-symbol">&amp;nbsp;</span>sentences):<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>print(s,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>similarity<span class="hljs-symbol">&amp;nbsp;</span>score<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>cosine_similarity(e,<span class="hljs-symbol">&amp;nbsp;</span>query_embedding))<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在安装<code>NumPy</code>和<code>sentence_transformers</code>之后，运行这个脚本应该会得到以下计算结果</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>Query:<span class="hljs-symbol">&amp;nbsp;</span>That<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>is<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>That<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>is<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>very<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>person<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>similarity<span class="hljs-symbol">&amp;nbsp;</span>score<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>0.94291496<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>That<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>is<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>happy<span class="hljs-symbol">&amp;nbsp;</span>dog<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>similarity<span class="hljs-symbol">&amp;nbsp;</span>score<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>0.69457746<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>Today<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>is<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>a<span class="hljs-symbol">&amp;nbsp;</span>sunny<span class="hljs-symbol">&amp;nbsp;</span>day<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>similarity<span class="hljs-symbol">&amp;nbsp;</span>score<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>0.25687605<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>该脚本的结果应该与所选模型在HuggingFace inference API上看到的结果一致。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.8.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>HuggingFace推理API相似度结果  </p>
+<h2 id="向量Embedding搜索在生产环境中的使用"><a href="#向量Embedding搜索在生产环境中的使用" class="headerlink" title="向量Embedding搜索在生产环境中的使用"></a>向量Embedding搜索在生产环境中的使用</h2><p>开发和生产是两个不同的东西，在学习了更多之后，你可能会开始问这样的问题:</p>
+<ul>
+<li><p>我把这些向量存储在哪里?</p>
+</li>
+<li><p>API应该是什么样子?</p>
+</li>
+<li><p>如何将其与过滤等传统搜索功能结合起来?</p>
+</li>
+</ul>
+<p>幸运的是，开发Redis的好人们决定为你找出这些问题，并将向量相似搜索(VSS)功能构建到现有的reresearch模块中。这基本上把Redis变成了一个低延迟的向量数据库。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.9.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>Redis是一个量数据库  </p>
+<p>VSS功能是作为reresearch模块的新功能而构建的。它允许开发人员像在Redis散列中存储任何其他字段一样轻松地存储向量。它提供了在大型向量空间中执行低延迟搜索所需的高级索引和搜索功能，通常分布在许多机器上的向量从数万到数亿不等。</p>
+<p>Redis现在支持两种类型的向量索引:</p>
+<ol>
+<li><p>Flat</p>
+</li>
+<li><p>分级可导航小世界(HNSW)</p>
+</li>
+</ol>
+<p>以及3个距离度量:</p>
+<ol>
+<li><p><code>LP</code> —— 欧几里得距离</p>
+</li>
+<li><p><code>IP</code> —— 内积</p>
+</li>
+<li><p><code>cos</code> —— 余弦相似度(如上图所示)</p>
+</li>
+</ol>
+<p>下面是一个使用<code>redis -py</code>在向量被加载到Redis后创建索引的例子。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>redis<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>Redis<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>from<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>redis.commands.search.field<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>import<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>VectorField,<span class="hljs-symbol">&amp;nbsp;</span>TagField<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>def<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>create_flat_index<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>(redis_conn:<span class="hljs-symbol">&amp;nbsp;</span>Redis,<span class="hljs-symbol">&amp;nbsp;</span>number_of_vectors:<span class="hljs-symbol">&amp;nbsp;</span>int,<span class="hljs-symbol">&amp;nbsp;</span>distance_metric:<span class="hljs-symbol">&amp;nbsp;</span>str=<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;COSINE&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>image_field<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>VectorField(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;img_vector&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;FLAT&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;TYPE&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;FLOAT32&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;DIM&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>512<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;DISTANCE_METRIC&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>distance_metric,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;INITIAL_CAP&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>number_of_vectors,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;BLOCK_SIZE&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>number_of_vectors&#125;)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>redis_conn.ft().create_index([image_field])<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>索引只需要创建一次，当新的哈希值存储在Redis中时，索引会自动重新索引。在将向量加载到Redis中并创建索引之后，就可以为各种基于相似性的搜索任务形成和执行查询。</p>
+<p>索引只需要创建一次，当新的哈希值存储在Redis中时，索引会自动重新索引。在将向量加载到Redis中并创建索引之后，就可以为各种基于相似性的搜索任务形成和执行查询。</p>
+<p>更好的是，所有现有的reresearch功能，如文本、标签和基于地理的搜索，都可以与VSS功能协同工作。这被称为“混合查询”。对于混合查询，传统的搜索功能可以用作向量搜索的预过滤器，这可以帮助限制搜索空间。</p>
+<p>上面的索引创建函数(<code>create_flat_index</code>)可以很容易地通过添加新字段(如<code>redis-py</code>中的<code>TagField</code>或<code>TextField</code>)来支持混合查询。</p>
+<h2 id="Redis-VSS演示"><a href="#Redis-VSS演示" class="headerlink" title="Redis VSS演示"></a>Redis VSS演示</h2><p>最近，我构建了一个web应用程序来探索这些功能。Fashion Product Finder利用了Redis中新的VSS功能，以及我最喜欢的Redis生态系统的其他部分，如<code>redis-om-python</code>。您可以访问应用程序在这里。</p>
+<p>注册使用该应用程序后，您将看到如下所示的页面。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.10.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>时尚产品查找应用程序，使用由Redis提供的向量相似度搜索  </p>
+<p>要通过文本表示查询类似的产品，请找到您喜欢的产品并单击<code>by text</code>。同样，要通过视觉向量搜索查询，请单击产品上的<code>by Image</code>按钮。</p>
+<p>可以为产品的性别和类别设置混合搜索属性，以便在执行向量搜索时，返回的项目将通过这些标记进行过滤。下面是选择右下角黑色手表时的视觉向量搜索示例。</p>
+<p><img src="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/640.11.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>通过图片查询类似手表后的搜索结果为黑色G-Shock手表。  </p>
+<p>这个演示是一种探索Redis VSS功能的有趣方式，然而，这并不是应用程序中使用的Redis生态系统的唯一组件。事实上，<strong>Redis是这个应用程序使用的唯一数据库</strong>，用RedisJSON存储产品元数据，用RediSearch存储向量数据。</p>
+<p>有关Redis和reresearch模块中VSS的更多信息，您可以查看以下资源:</p>
+<h4 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h4><ul>
+<li><p>VSS Documentation：<a target="_blank" rel="noopener" href="https://redis.io/docs/stack/search/reference/vectors/">https://redis.io/docs/stack/search/reference/vectors/</a></p>
+</li>
+<li><p>Redis Stack Documentation：<a target="_blank" rel="noopener" href="https://partee.io/2022/08/11/vector-embeddings/Redis">https://partee.io/2022/08/11/vector-embeddings/Redis</a> Stack docuemntation</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RAG/" class="category-chain-item">RAG</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/RAG/" class="print-no-link">#RAG</a>
+      
+        <a href="/tags/Embedding/" class="print-no-link">#Embedding</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>大模型应用中大部分人真正需要去关心的核心——Embedding</div>
+      <div>http://yaoliyc.github.io/2025/02/24/大模型应用中大部分人真正需要去关心的核心——Embedding/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/" title="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%B8%BB%E6%B5%81%E5%BA%94%E7%94%A8RAG%E7%9A%84%E4%BB%8B%E7%BB%8D%E2%80%94%E2%80%94%E4%BB%8E%E6%9E%B6%E6%9E%84%E5%88%B0%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82/" title="大模型主流应用RAG的介绍——从架构到技术细节">
+                        <span class="hidden-mobile">大模型主流应用RAG的介绍——从架构到技术细节</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

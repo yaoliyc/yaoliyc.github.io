@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案 本文主要内容：  为什么一般情况下RAG的检索相关性存在问题？  Rerank为什么可以解决这个问题？  几种常用Rerank组合评测；  如何在自己的产品中使用Rerank？    检索增强生成（RAG）是解决大语言模型（LLM）实际使用中的一套完整的技术，它可以有效解决LLM的三个主要问题：数据时效性、幻觉和数据安全问题（在我之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案 本文主要内容：  为什么一般情况下RAG的检索相关性存在问题？  Rerank为什么可以解决这个问题？  几种常用Rerank组合评测；  如何在自己的产品中使用Rerank？    检索增强生成（RAG）是解决大语言模型（LLM）实际使用中的一套完整的技术，它可以有效解决LLM的三个主要问题：数据时效性、幻觉和数据安全问题（在我之">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.1.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.2.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.3.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.4.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.5.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.6.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.7.webp">
+<meta property="article:published_time" content="2025-02-24T08:13:45.000Z">
+<meta property="article:modified_time" content="2025-03-02T08:58:31.600Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Rerank">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-24 16:13" pubdate>
+          2025年2月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案"><a href="#Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案" class="headerlink" title="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案"></a>Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</h1><blockquote>
+<p>本文主要内容：</p>
+<ul>
+<li><p>为什么一般情况下RAG的检索相关性存在问题？</p>
+</li>
+<li><p>Rerank为什么可以解决这个问题？</p>
+</li>
+<li><p>几种常用Rerank组合评测；</p>
+</li>
+<li><p>如何在自己的产品中使用Rerank？</p>
+</li>
+</ul>
+</blockquote>
+<p>检索增强生成（RAG）是解决大语言模型（LLM）实际使用中的一套完整的技术，它可以有效解决LLM的三个主要问题：<strong>数据时效性</strong>、<strong>幻觉</strong>和<strong>数据安全问题</strong>（在我之前的文章《大模型主流应用RAG的介绍——从架构到技术细节》中有详细介绍）。但是随着RAG越来越火热，使用者越来越多，我们也会发现用的好的人&#x2F;团队其实还是不多的。这也是RAG常被人吐槽的一点：<strong>入门简单，用好却非常难！</strong></p>
+<p>对于RAG的效果，我们之前已经做了很多方面的优化了，包括：</p>
+<ul>
+<li><p><strong>优化内容提取的方法</strong>：从源头解决内容提取的有效性，包括文本内容、表格内容（保留制表符）和图片内容（OCR识别）等，可以参看我之前的文章《完全指南——使用python提取PDF中的文本信息（包括表格和图片OCR）》；</p>
+</li>
+<li><p><strong>优化chunking</strong>：从最开始的512固定长度切分，到后面的句切分，再到后面的NLTK和SpaCy，具体可参见我之前写的《最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果》；</p>
+</li>
+<li><p><strong>再之后是优化embedding模型</strong>：Embedding模型的选择其实很魔性，我们在优化过程中也会不断否定之前的一些判断。比如我们最开始用m3e，后面用bge，再后面还用了通义千问的embedding模型。总体来说，收费的通义千问还是好一些，但是不明显，有些方面却不如bge。最近一朋友也向我推荐了Jina embedding模型，不过他们的中文模型需要12月份才出来；</p>
+</li>
+<li><p><strong>我们还优化了其他一些过程</strong>：比如prompt模板、关键词摘要、元数据存储等。</p>
+</li>
+</ul>
+<p>这些优化确实给我们带来了非常好的效果，但不够！我们在一些客户的实践过程中，还是发现相关性效果不佳，甚至造成了其中一个客户选择了其他方案（使用RAG+GPT-4的方案）。</p>
+<p>我们还是坚持用国产大模型（如Baichuan2-13B、ChatGLM3-6B和QWen-14B等），毕竟主要服务的还是国内客户，加上现在接触的多数客户其实都有私有化部署的需求。所以我们进行了一段时间的探索，发现我们还有一项很有效的优化没有去做——ReRank。</p>
+<p>所以，虽然Rerank优化我们还在做，但是今天我们可以先聊聊ReRank这个话题。</p>
+<h2 id="为什么需要Rerank"><a href="#为什么需要Rerank" class="headerlink" title="为什么需要Rerank"></a>为什么需要Rerank</h2><p>我们发现，在10月中旬之前，国内外的互联网上很难发现Rerank相关的话题。有少量人提到了，但是基本上都没有提到解决方案。我和小明在讨论Rerank的时候其实是先从提问题开始的。</p>
+<h3 id="Elasticsearch中的相似度检索算法"><a href="#Elasticsearch中的相似度检索算法" class="headerlink" title="Elasticsearch中的相似度检索算法"></a>Elasticsearch中的相似度检索算法</h3><p>前面说了，我们自己的RAG产品之前是存在一些相关性问题的，其他方面能优化的我们觉得也基本上优化的差不多了，除了我们采用的国产大模型在通用能力上和ChatGPT-3.5&#x2F;4是存在差距的。我们发现的最大的问题就是使用elasticsearch的<strong>retrieval</strong>召回的内容相关度有问题，多数情况下score最高的chunk相关度没问题，但是top2-5的相关度就很随机了，这是最影响最终结果的。</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图1：elasticsearch8.4的knn使用方式  </p>
+<p>我们看了elasticsearch的相似度算法，es用的是KNN算法（开始我们以为是暴力搜索），但仔细看了一下，在es8的相似度检索中，用的其实是基于HNSW（分层的最小世界导航算法），HNSW是有能力在几毫秒内从数百万个数据点中找到最近邻的。</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.1.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图2：elasticsearch实际使用的是HNSW算法  </p>
+<h3 id="HNSW带来的随机性问题"><a href="#HNSW带来的随机性问题" class="headerlink" title="HNSW带来的随机性问题"></a>HNSW带来的随机性问题</h3><p>我们想象这么一个场景：你昨天刚在其他地方看到过一本新书，你想在图书馆找到类似的书。K-最近邻（KNN）算法的逻辑是浏览书架上的每一本书，并将它们从最相似到最不相似的顺序排列，以确定最相似的书（最有可能是你昨天看过的那本）。这也就是我们常说的暴力搜索，你有耐心做这么麻烦的工作吗？相反，如果我们对图书馆中的图书进行预排序和索引，要找到与你昨天看过的新书相似的书，你所需要做的就是去正确的楼层，正确的区域，正确的通道找到相似的书。</p>
+<p>此外，<strong>你通常不需要对前10本相似的书进行精确排名，比如100%、99%或95%的匹配度</strong>，而是通通先拿回来。这就是<strong>近似近邻（ANN）</strong>的思想。你应该注意到了，这里已经出现了一些随机性——不做匹配分数的排名。但是这些准确度上的损失是为了让检索效率更快，<strong>为了显著降低计算成本，它牺牲了找到绝对最近邻的保证，这算是在计算效率和准确性之间取得平衡</strong>。</p>
+<p>ANN算法目前主要有三种：</p>
+<ul>
+<li><p><strong>基于图的算法创建数据的图</strong>表示，最主要的就是**分层可导航小世界图算法(HNSW)**。</p>
+</li>
+<li><p><strong>基于哈希的算法</strong>：流行的算法包括:位置敏感哈希（LSH）、多索引哈希（MIH）；</p>
+</li>
+<li><p><strong>基于树的算法</strong>：流行的是kd树、球树和随机投影树（RP树）。对于低维空间（≤10），基于树的算法是非常有效的。</p>
+</li>
+</ul>
+<p>HNSW借鉴了跳表（Skip List）的思路。跳表是一种数据结构，用于维护一组已排序的元素，并允许进行高效的搜索、插入和删除操作。它是由William Pugh在1989年发明的。图(3)显示了数字[3、6、7、9、12、17、19、21、25、26]的排序链表。假设我们想找到目标19。当值小于目标时，我们向右移动，如果是传统的方式，需要6步才能找到它。</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.2.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图3：链表中查找数据  </p>
+<p>但是我们在每个节点增加向后的指向指针，比如列表中每三个其他节点都有一个指向后面三个节点的指针，如图(4)所示，那么只需要3步就可以到达19</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.3.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图4：跳表每三个节点就设置一个多指向指针节点，可以让搜索速度明显加快，如果我们再增加这个指针节点数量呢？  </p>
+<p>这就是small world的底层思路，说回到小世界（small world）网络，它是一种特殊的网络，在这种网络中，你可以快速地联系到网络中的其他人或点。这有点像“凯文·培根的六度”(Six Degrees of Kevin Bacon)游戏，在这个游戏中，你可以通过一系列其他演员，在不到六个步骤的时间里，将任何演员与凯文·培根联系起来。想象一下，你有一群朋友排成一个圆圈，如图5所示。每个朋友都与坐在他们旁边的人直接相连。我们称它为“原始圆”。</p>
+<p>现在，这就是奇迹发生的地方。你可以随机选择将其中一些连接改变给圆圈中的其他人，就像图5中的红色连接线一样。这就像这些连接的“抢椅子”游戏。有人跳到另一把椅子上的几率用概率p表示。如果p很小，移动的人就不多，网络看起来就很像原来的圆圈。但如果p很大，很多人就会跳来跳去，网络就会变得有点混乱。当您选择正确的p值(不太小也不太大)时，红色连接是最优的。网络变成了一个小世界网络。你可以很快地从一个朋友转到另一个朋友(这就是“小世界”的特点)。</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.4.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图5：small world网络结构  </p>
+<p>现在我们要扩展到高维空间，图中的每个节点都是一个高维向量。在高维空间中，搜索速度会变慢。这是不可避免的“维度的诅咒”。HNSW是一种高级数据结构，用于优化高维空间中的相似性搜索。让我们看看HNSW如何构建图的层次结构。HNSW从图(6)中的第0层这样的基础图开始。它通常使用<strong>随机初始化数据点</strong>来构建。</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.5.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图6：HNSW的结构示例  </p>
+<p>这里大家要注意再次出现了”<strong>随机</strong>“，所以，为了检索的快速，HNSW算法会存在一些随机性，反映在实际召回结果中，最大的影响就是返回结果中top_K并不是我们最想要的，至少这K个文件的排名并不是我们认为的从高分到低分排序的。</p>
+<h3 id="Rerank可以在小范围内逐一计算分值"><a href="#Rerank可以在小范围内逐一计算分值" class="headerlink" title="Rerank可以在小范围内逐一计算分值"></a>Rerank可以在小范围内逐一计算分值</h3><p><strong>因为在搜索的时候存在随机性，这应该就是我们在RAG中第一次召回的结果往往不太满意的原因</strong>。但是这也没办法，如果你的索引有数百万甚至千万的级别，那你只能牺牲一些精确度，换回时间。这时候我们可以做的就是增加<code>top_k</code>的大小，比如从原来的10个，增加到30个。然后再使用更精确的算法来做rerank，使用一一计算打分的方式，做好排序。比如30次的遍历相似度计算的时间，我们还是可以接受的。</p>
+<p><em>关于HNSW的内容，大家可以点击文章左下角的”</em>_<strong>阅读原文</strong>_<em>“，里面有一篇比较详细的HNSW的文章介绍。</em></p>
+<h2 id="主要的Reank方式评测"><a href="#主要的Reank方式评测" class="headerlink" title="主要的Reank方式评测"></a>主要的Reank方式评测</h2><h3 id="评测方法"><a href="#评测方法" class="headerlink" title="评测方法"></a>评测方法</h3><p>为了衡量我们的检索系统的有效性，我们主要依赖于两个被广泛接受的指标:<strong>命中率</strong>和**平均倒数排名(MRR)**。让我们深入研究这些指标，了解它们的重要性以及它们是如何运作的。我们来解释一下这两个指标：</p>
+<ul>
+<li><p><strong>命中率</strong>：Hit rate计算在前k个检索文档中找到正确答案的查询比例。简单来说，它是关于我们的系统在前几次猜测中正确的频率。</p>
+</li>
+<li><p>**平均倒数排名(MRR)**：对于每个查询，MRR通过查看排名最高的相关文档的排名来评估系统的准确性。具体来说，它是所有查询中这些排序的倒数的平均值。因此，如果第一个相关文档是顶部结果，则倒数排名为1;如果是第二个，倒数是1&#x2F;2，以此类推。</p>
+</li>
+</ul>
+<h3 id="评测结果"><a href="#评测结果" class="headerlink" title="评测结果"></a>评测结果</h3><p>具体的评测过程大家可以看[我的Blog里面《提升RAG…》这篇]，也是llamaindex最近刚刚发布的一篇著名rerank评测文章，我这里就不具体展开了，直接用他们的结果。评测采用的是<strong>embedding模型</strong> + <strong>rerank模型</strong>的方式进行的。</p>
+<p>以下是使用的模型:</p>
+<p><strong>Embedding模型</strong>:</p>
+<ul>
+<li><p>OpenAI Embedding</p>
+</li>
+<li><p>Voyage Embedding</p>
+</li>
+<li><p>CohereAI Embedding (v2.0&#x2F; v3.0)</p>
+</li>
+<li><p>Jina Embeddings</p>
+</li>
+<li><p>BAAI&#x2F;bge-large-en</p>
+</li>
+</ul>
+<p><strong>Rerank模型</strong>:</p>
+<ul>
+<li><p>CohereAI</p>
+</li>
+<li><p>bge-reranker-base</p>
+</li>
+<li><p>bge-reranker-large</p>
+</li>
+</ul>
+<blockquote>
+<p>值得一提的是，这些结果为这个特定数据集和任务的性能提供了坚实的见解。但是，实际结果可能会根据数据特征、数据集大小和其他变量(如chunk_size、similarity_top_k等)而有所不同。</p>
+</blockquote>
+<p>下表展示了基于<strong>命中率</strong>和<strong>MRR</strong>指标的评估结果:</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.6.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图7：测试结果  </p>
+<p>我对LlamaIndex的评测结果做一个简单总结：</p>
+<ul>
+<li><p><strong>目前rerank模型里面，最好的应该是cohere，不过它是收费的。开源的是智源发布的bge-reranker-base和bge-reranker-large。bge-reranker-large的能力基本上接近cohere，而且在一些方面还更好；</strong></p>
+</li>
+<li><p><strong>几乎所有的Embeddings都在重排之后显示出更高的命中率和MRR，所以rerank的效果是非常显著的；</strong></p>
+</li>
+<li><p><strong>embedding模型和rerank模型的组合也会有影响，可能需要开发者在实际过程中去调测最佳组合。</strong></p>
+</li>
+</ul>
+<h2 id="我们可以如何使用Rerank"><a href="#我们可以如何使用Rerank" class="headerlink" title="我们可以如何使用Rerank"></a>我们可以如何使用Rerank</h2><p>目前最无脑的方式就是使用bge-reranker-large，我们可以在<a target="_blank" rel="noopener" href="https://huggingface.co/BAAI/bge-reranker-large/tree/main">https://huggingface.co/BAAI/bge-reranker-large/tree/main</a> 上找到models文件，下载安装。我已经下载了：</p>
+<p><img src="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/640.7.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>图8：bge-reranker-large的models文件，大约4.5GB  </p>
+<p>这两天要给它安装起来，测测我们的产品rerank之后的效果。</p>
+<p>其实还有一种比较简单的方式，这种方式其实是从上面的原理中得出来的：</p>
+<ul>
+<li><p>第一次召回不精确，是因为要对抗时间过长，所以使用了ANN等方法；</p>
+</li>
+<li><p>那么，我们是否可以在已经得到top_k的情况下，使用KNN这种暴力检索（逐个计算相似度，打分）来做一个精准排序，然后取top_n。假设这里k&#x3D;30，n&#x3D;5.</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RAG/" class="category-chain-item">RAG</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/RAG/" class="print-no-link">#RAG</a>
+      
+        <a href="/tags/Rerank/" class="print-no-link">#Rerank</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</div>
+      <div>http://yaoliyc.github.io/2025/02/24/Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/25/AI%E5%B7%A5%E7%A8%8B%E5%B8%88%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" title="AI工程师学习计划">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">AI工程师学习计划</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/" title="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果">
+                        <span class="hidden-mobile">最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

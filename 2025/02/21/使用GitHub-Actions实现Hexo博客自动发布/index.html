@@ -1,0 +1,847 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="使用GitHub Actions实现Hexo博客自动发布 Excerpt我在使用jenkins实现hexo博客自动发布中介绍了可以使用jenkins实现博客自动发布，其实还有一种更简单的方法，就是GitHub提供的持续集成服务：GitHub Actions。下面就来介绍一下如何使用GitHub Actions来实现将hexo博客自动编译及发布到GitHub Pages和   我在使用jenkins">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用GitHub Actions实现Hexo博客自动发布">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="使用GitHub Actions实现Hexo博客自动发布 Excerpt我在使用jenkins实现hexo博客自动发布中介绍了可以使用jenkins实现博客自动发布，其实还有一种更简单的方法，就是GitHub提供的持续集成服务：GitHub Actions。下面就来介绍一下如何使用GitHub Actions来实现将hexo博客自动编译及发布到GitHub Pages和   我在使用jenkins">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925200928640-1508087348.jpg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925200944430-379223616.jpg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201003951-249671816.jpg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201011953-1253626077.jpg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201022420-1262514263.jpg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201039097-652391522.jpg">
+<meta property="article:published_time" content="2025-02-21T03:19:25.000Z">
+<meta property="article:modified_time" content="2025-03-02T08:58:31.656Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="Github Actions">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925200928640-1508087348.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>使用GitHub Actions实现Hexo博客自动发布 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="使用GitHub Actions实现Hexo博客自动发布"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-21 11:19" pubdate>
+          2025年2月21日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          15 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用GitHub Actions实现Hexo博客自动发布</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="使用GitHub-Actions实现Hexo博客自动发布"><a href="#使用GitHub-Actions实现Hexo博客自动发布" class="headerlink" title="使用GitHub Actions实现Hexo博客自动发布"></a>使用GitHub Actions实现Hexo博客自动发布</h1><blockquote>
+<h2 id="Excerpt"><a href="#Excerpt" class="headerlink" title="Excerpt"></a>Excerpt</h2><p>我在使用jenkins实现hexo博客自动发布中介绍了可以使用jenkins实现博客自动发布，其实还有一种更简单的方法，就是GitHub提供的持续集成服务：GitHub Actions。下面就来介绍一下如何使用GitHub Actions来实现将hexo博客自动编译及发布到GitHub Pages和</p>
+</blockquote>
+<hr>
+<p>我在<a target="_blank" rel="noopener" href="https://blog.csdn.net/u010698107/article/details/115888855">使用jenkins实现hexo博客自动发布</a>中介绍了可以使用jenkins实现博客自动发布，其实还有一种更简单的方法，就是GitHub提供的持续集成服务：GitHub Actions。下面就来介绍一下如何使用GitHub Actions来实现将hexo博客自动编译及发布到GitHub Pages和Gitee pages上。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#github-actions-%E7%AE%80%E4%BB%8B">GitHub Actions 简介</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87">环境准备</a><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#%E5%8D%9A%E5%AE%A2%E4%BB%93%E5%BA%93">博客仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#github-token%E9%85%8D%E7%BD%AE">GitHub Token配置</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#gitee-token%E9%85%8D%E7%BD%AE">Gitee Token配置</a></li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#%E9%85%8D%E7%BD%AEworkflow%E6%96%87%E4%BB%B6">配置workflow文件</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#%E9%AA%8C%E8%AF%81">验证</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hiyong/p/15335362.html#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+<h2 id="GitHub-Actions-简介"><a href="#GitHub-Actions-简介" class="headerlink" title="GitHub Actions 简介"></a>GitHub Actions 简介</h2><p>GitHub Actions把代码拉取，打包，触发测试，发布等操作当成一个个的actions，持续集成就是将这些actions组合起来，jenkins也类似。</p>
+<p>在项目的<code>.github/workflows</code> 目录中创建一个yaml格式的workflow 文件来编写GitHub Actions 工作流程，GitHub会自动运行该文件。workflow语法可参考：<a target="_blank" rel="noopener" href="https://docs.github.com/cn/actions/learn-github-actions/workflow-syntax-for-github-actions">https://docs.github.com/cn/actions/learn-github-actions/workflow-syntax-for-github-actions</a></p>
+<p>开发者可以将actions放到代码仓库供其他开发者引用，可以到官网搜索开源的actions：<a target="_blank" rel="noopener" href="https://github.com/marketplace?type=actions">https://github.com/marketplace?type=actions</a></p>
+<p>可以使用GitHub Actions实现博客自动发布，将静态博客页面部署到多个服务器上，比如GitHub Pages，Gitee pages以及云服务器上。本文使用GitHub Actions实现将Hexo博客自动编译并发布到GitHub Pages 和 Gitee pages上，并且实现Gitee pages自动更新。</p>
+<p>下面介绍具体的配置流程。</p>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><h2 id="博客仓库"><a href="#博客仓库" class="headerlink" title="博客仓库"></a>博客仓库</h2><p>我的个人博客是使用 hexo 框架搭建的，搭建方法可参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/u010698107/article/details/113781267">Hexo+Github&#x2F;Gitee 搭建个人博客</a>。</p>
+<p>主要有3个仓库：</p>
+<ul>
+<li>私有仓库Blog：存储 Hexo 项目文章以及源代码</li>
+<li>公共仓库hiyongz.github.io：存储编译之后的静态页面。</li>
+<li>Gitee公共仓库：内容和hiyongz.github.io一样，只是使用的服务不同。</li>
+</ul>
+<p>使用GitHub Actions要实现的是当Blog仓库指定目录有更新时，触发自动编译并部署博客到hiyongz.github.io仓库中，并将hiyongz.github.io仓库同步到Gitee公共仓库，同步完成后，更新Gitee Pages。</p>
+<h2 id="GitHub-Token配置"><a href="#GitHub-Token配置" class="headerlink" title="GitHub Token配置"></a>GitHub Token配置</h2><p>配置发布秘钥，用于将生成的静态博客文件 push 至 GitHub Pages 所在的仓库hiyongz.github.io：</p>
+<p><strong>1、生成秘钥</strong></p>
+<p>执行如下命令生成公钥和私钥，替换邮件地址为你的github邮箱地址，其实也可以不使用邮箱，这里只是为了便于辨识。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh-keygen -f hexo-deploy-key -t rsa -C <span class="hljs-string">&quot;username@example.com&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>命令执行后会生成两个文件：<code>hexo-deploy-key</code> 和 <code>hexo-deploy-key.pub</code> 。</p>
+<p><strong>2、将公钥添加到Github Pages仓库中</strong></p>
+<p>步骤：hiyongz.github.io仓库 -&gt; Settings -&gt; Deploy keys -&gt; Add deploy key</p>
+<ul>
+<li>Title设置为 <code>HEXO_DEPLOY_PUB</code> (可以根据自己喜好设置)</li>
+<li>Key填写 <code>github-deploy-key.pub</code> 文件内容</li>
+<li>勾选 <code>Allow write access</code> 选项</li>
+</ul>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925200928640-1508087348.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><strong>3、将私钥添加到博客源码仓库中</strong></p>
+<p>步骤：博客仓库 -&gt; Settings -&gt; Secrets -&gt; New repository secret</p>
+<ul>
+<li>Name 填写 <code>HEXO_DEPLOY_KEY</code> 。</li>
+<li>Value 填写 <code>github-deploy-key</code> 文件内容。</li>
+</ul>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925200944430-379223616.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Gitee-Token配置"><a href="#Gitee-Token配置" class="headerlink" title="Gitee Token配置"></a>Gitee Token配置</h2><p><del>Gitee Token配置和Github类似。</del>gitee pages暂停服务了</p>
+<p>秘钥不需要重新生成，直接使用前面生成的秘钥。</p>
+<p><strong>1、将公钥添加到Gitee Pages仓库中</strong></p>
+<p>步骤：gitee pages仓库 -&gt; 管理 -&gt; 公钥管理 -&gt; 添加部署公钥</p>
+<p>和github一样需要对仓库有写权限，点击【添加个人公钥】</p>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201003951-249671816.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>复制粘贴文件 <code>github-deploy-key.pub</code> 中的内容</p>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201011953-1253626077.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><strong>2、将私钥添加到Github的博客源码仓库中</strong></p>
+<p>不需要重新创建，直接使用 <code>HEXO_DEPLOY_KEY</code> 就行。</p>
+<p><strong>3、配置Gitee 帐号的密码</strong></p>
+<p>步骤：Github博客仓库 -&gt; Settings -&gt; Secrets -&gt; New repository secret</p>
+<ul>
+<li>Name 填写 <code>GITEE_PASSWORD</code> 。</li>
+<li>Value 填写Gitee 帐号的密码。</li>
+</ul>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201022420-1262514263.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="配置workflow文件"><a href="#配置workflow文件" class="headerlink" title="配置workflow文件"></a>配置workflow文件</h2><p>下面来配置 Github Actions，编写workflow文件。</p>
+<p>在博客仓库根目录下创建 <code>.github/workflows/deploy.yml</code> 文件，yaml文件名可以随意设置。</p>
+<p>下面是我的workflow文件（参考了<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/hexo-action#%F0%9F%8D%8Cexample-workflow---hexo-deploy">Hexo Action</a>和<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/gitee-pages-action">Gitee Pages Action</a>提供的例子）：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs yml"><span class="hljs-attr">name:</span> <span class="hljs-string">Hexo</span> <span class="hljs-string">deploy</span><br><br><span class="hljs-attr">on:</span> <br>  <span class="hljs-attr">push:</span><br>    <span class="hljs-attr">paths-ignore:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;source/_drafts/**&#x27;</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;.github/**&#x27;</span><br><span class="hljs-attr">jobs:</span><br>  <span class="hljs-attr">build:</span><br>    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">A</span> <span class="hljs-string">job</span> <span class="hljs-string">to</span> <span class="hljs-string">deploy</span> <span class="hljs-string">blog.</span><br>    <span class="hljs-attr">steps:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span><br>      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v1</span><br>      <span class="hljs-attr">with:</span><br>        <span class="hljs-attr">submodules:</span> <span class="hljs-literal">true</span><br>        <br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Cache</span> <span class="hljs-string">node</span> <span class="hljs-string">modules</span><br>      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/cache@v1</span><br>      <span class="hljs-attr">id:</span> <span class="hljs-string">cache</span><br>      <span class="hljs-attr">with:</span><br>        <span class="hljs-attr">path:</span> <span class="hljs-string">node_modules</span><br>        <span class="hljs-attr">key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">runner.os</span> <span class="hljs-string">&#125;&#125;-node-$&#123;&#123;</span> <span class="hljs-string">hashFiles(&#x27;**/package-lock.json&#x27;)</span> <span class="hljs-string">&#125;&#125;</span><br>        <span class="hljs-attr">restore-keys:</span> <span class="hljs-string">|</span><br><span class="hljs-string">          $&#123;&#123; runner.os &#125;&#125;-node-</span><br><span class="hljs-string"></span>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">Dependencies</span><br>      <span class="hljs-attr">if:</span> <span class="hljs-string">steps.cache.outputs.cache-hit</span> <span class="hljs-type">!=</span> <span class="hljs-string">&#x27;true&#x27;</span><br>      <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span><br>        <br>    <span class="hljs-comment"># Deploy hexo blog website.</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span><br>      <span class="hljs-attr">id:</span> <span class="hljs-string">deploy</span><br>      <span class="hljs-attr">uses:</span> <span class="hljs-string">yaoliyc/hexo-action@master</span><br>      <span class="hljs-attr">with:</span><br>        <span class="hljs-attr">deploy_key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.HEXO_DEPLOY_KEY</span> <span class="hljs-string">&#125;&#125;</span><br>        <span class="hljs-attr">user_name:</span> <span class="hljs-string">github用户名</span><br>        <span class="hljs-attr">user_email:</span> <span class="hljs-string">github邮箱</span><br>        <span class="hljs-attr">commit_msg:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.event.head_commit.message</span> <span class="hljs-string">&#125;&#125;ion)</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Get</span> <span class="hljs-string">the</span> <span class="hljs-string">output</span><br>      <span class="hljs-attr">run:</span> <span class="hljs-string">|</span><br><span class="hljs-string">        echo &quot;$&#123;&#123; steps.deploy.outputs.notify &#125;&#125;&quot;</span><br><span class="hljs-string"></span><span class="hljs-comment">#   sync:</span><br><span class="hljs-comment">#     needs: build</span><br><span class="hljs-comment">#     runs-on: ubuntu-latest</span><br><span class="hljs-comment">#     steps:</span><br><span class="hljs-comment">#       - name: Sync to Gitee</span><br><span class="hljs-comment">#         uses: wearerequired/git-mirror-action@master</span><br><span class="hljs-comment">#         env:</span><br><span class="hljs-comment">#           SSH_PRIVATE_KEY: $&#123;&#123; secrets.HEXO_DEPLOY_KEY &#125;&#125;</span><br><span class="hljs-comment">#         with:</span><br><span class="hljs-comment">#           # 源仓库</span><br><span class="hljs-comment">#           source-repo: git@github.com:hiyongz/hiyongz.github.io.git</span><br><span class="hljs-comment">#           # 目标仓库</span><br><span class="hljs-comment">#           destination-repo: git@gitee.com:hiyong/hiyong.git</span><br><span class="hljs-comment">#   reload-pages:</span><br><span class="hljs-comment">#     needs: sync</span><br><span class="hljs-comment">#     runs-on: ubuntu-latest</span><br><span class="hljs-comment">#     steps:</span><br><span class="hljs-comment">#       - name: Build Gitee Pages</span><br><span class="hljs-comment">#         uses: yanglbme/gitee-pages-action@main</span><br><span class="hljs-comment">#         with:</span><br><span class="hljs-comment">#           gitee-username: hiyong</span><br><span class="hljs-comment">#           gitee-password: $&#123;&#123; secrets.GITEE_PASSWORD &#125;&#125;</span><br><span class="hljs-comment">#           gitee-repo: hiyong/hiyong</span><br><span class="hljs-comment">#           branch: master</span><br><br></code></pre></td></tr></table></figure>
+
+<p>部分字段解释：</p>
+<p>1、name：workflow 名称</p>
+<p>2、on：触发 workflow 的事件</p>
+<ul>
+<li><code>push</code>：push事件</li>
+<li><code>paths-ignore</code>：忽略指定的目录，也就是在忽略路径外的其它目录文件改动时才触发。</li>
+<li>还可以设置多种触发条件，比如支持cron语法实现定时触发，参考<a target="_blank" rel="noopener" href="https://docs.github.com/cn/actions/reference/events-that-trigger-workflows">这里</a>。</li>
+</ul>
+<p>3、jobs：执行任务</p>
+<ul>
+<li><code>build</code>：博客编译和发布，发布到Github Pages</li>
+<li><code>sync</code>：将更新后的hiyongz.github.io仓库同步到Gitee</li>
+<li><code>reload-pages</code>：自动更新 Pages，因为Gitee Pages不像GitHub Pages 那样提交代码就自动更新。</li>
+<li><code>runs-on</code>：运行环境，支持windows，Ubuntu和macOS</li>
+<li><code>steps</code>：指定每个 Job 的运行步骤</li>
+<li><code>sma11black/hexo-action@v1.0.3</code>：博客构建发布，引用了<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/hexo-action#%F0%9F%8D%8Cexample-workflow---hexo-deploy">Hexo Action</a>：</li>
+<li><code>wearerequired/git-mirror-action@master</code>：仓库同步，引用了<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/git-mirror-action">git-mirror-action</a></li>
+<li><code>yanglbme/gitee-pages-action@main</code>：自动更新Gitee Pages，引用了<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/gitee-pages-action">Gitee Pages Action</a></li>
+</ul>
+<p>更多workflow语法可参考 <a target="_blank" rel="noopener" href="https://docs.github.com/cn/actions/learn-github-actions/workflow-syntax-for-github-actions">Workflow syntax for GitHub Actions</a> 。</p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>更新文章后push到博客仓库，如果满足条件，博客仓库中的Actions会自动触发：</p>
+<p><img src="/2025/02/21/%E4%BD%BF%E7%94%A8GitHub-Actions%E5%AE%9E%E7%8E%B0Hexo%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E5%8F%91%E5%B8%83/2229336-20210925201039097-652391522.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>有可能报如下错误信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">Error: Need phone captcha validation, please follow wechat official account <span class="hljs-string">&quot;Gitee&quot;</span> to <span class="hljs-built_in">bind</span> account to turn off authentication.<br></code></pre></td></tr></table></figure>
+
+<p>微信公众号关注Gitee，绑定Gitee账号就可以了。</p>
+<p>查看hiyongz.github.io和Gitee仓库可以发现有新的更新，并且博客也更新了，这样实现了博客的自动发布，只要将文章写好push到博客仓库就什么也不用管了。</p>
+<p>如果Actions执行失败会收到一个邮件。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>除了GitHub Actions外，还可以使用<a target="_blank" rel="noopener" href="https://travis-ci.org/">Travis CI</a>实现持续集成，它可以绑定Github 上的项目。</p>
+<p>使用这些持续集成工具能有效提升效率，比如每次文章更新上传后，GitHub Actions会自动触发编译发布操作，只专注写文章就行了。</p>
+<p><strong>参考文档：</strong></p>
+<ol>
+<li><p>GitHub Actions 快速入门：<a target="_blank" rel="noopener" href="https://docs.github.com/cn/actions/quickstart">https://docs.github.com/cn/actions/quickstart</a></p>
+</li>
+<li><p>GitHub Actions：<a target="_blank" rel="noopener" href="https://github.com/actions">https://github.com/actions</a></p>
+</li>
+<li><p>Gitee Pages Action：<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/gitee-pages-action">https://github.com/marketplace/actions/gitee-pages-action</a></p>
+</li>
+<li><p>git-mirror-action：<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/git-mirror-action">https://github.com/marketplace/actions/git-mirror-action</a></p>
+</li>
+<li><p>Hexo Action：<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/hexo-action">https://github.com/marketplace/actions/hexo-action</a></p>
+</li>
+<li><p>awesome-actions：<a target="_blank" rel="noopener" href="https://github.com/sdras/awesome-actions">awesome-actions</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/marketplace?type=actions">https://github.com/marketplace?type=actions</a></p>
+</li>
+<li><p>workflow语法: <a target="_blank" rel="noopener" href="https://docs.github.com/cn/actions/learn-github-actions/workflow-syntax-for-github-actions">https://docs.github.com/cn/actions/learn-github-actions/workflow-syntax-for-github-actions</a></p>
+</li>
+</ol>
+<p><strong>--THE END–</strong></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/hexo/" class="print-no-link">#hexo</a>
+      
+        <a href="/tags/Github-Actions/" class="print-no-link">#Github Actions</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用GitHub Actions实现Hexo博客自动发布</div>
+      <div>http://yaoliyc.github.io/2025/02/21/使用GitHub-Actions实现Hexo博客自动发布/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/21/deepseek%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="deepseek学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">deepseek学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/21/%E3%80%90APP-%E9%80%86%E5%90%91%E7%99%BE%E4%BE%8B%E3%80%91%E6%9F%90%E7%93%A3-app-%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/" title="【APP 逆向百例】某瓣 app 逆向分析">
+                        <span class="hidden-mobile">【APP 逆向百例】某瓣 app 逆向分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

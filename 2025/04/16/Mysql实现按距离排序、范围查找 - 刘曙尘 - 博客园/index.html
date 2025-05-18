@@ -1,0 +1,780 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Mysql实现按距离排序、范围查找现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。 实现实现过程主要分为四步：     搜索 在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。    过滤 搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql实现按距离排序、范围查找">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="Mysql实现按距离排序、范围查找现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。 实现实现过程主要分为四步：     搜索 在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。    过滤 搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180905021-1403485682.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180929615-603715276.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180956037-674314141.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181016802-1620997722.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181042615-564048244.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181202224-1107522791.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181224537-190479827.png">
+<meta property="article:published_time" content="2025-04-16T02:11:34.000Z">
+<meta property="article:modified_time" content="2025-05-18T02:32:03.066Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="spatial4j">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Mysql实现按距离排序、范围查找 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Mysql实现按距离排序、范围查找"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-16 10:11" pubdate>
+          2025年4月16日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          855 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Mysql实现按距离排序、范围查找</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Mysql实现按距离排序、范围查找"><a href="#Mysql实现按距离排序、范围查找" class="headerlink" title="Mysql实现按距离排序、范围查找"></a>Mysql实现按距离排序、范围查找</h1><p>现在几乎所有的O2O应用中都会存在“按范围搜素、离我最近、显示距离”等等基于位置的交互，那这样的功能是怎么实现的呢？本文提供的实现方式，适用于所有数据库。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>实现过程主要分为四步：   </p>
+<ol>
+<li>搜索 <br>在数据库中搜索出接近指定范围内的商户，如：搜索出1公里范围内的。   </li>
+<li>过滤 <br>搜索出来的结果可能会存在超过1公里的，需要再次过滤。如果对精度没有严格要求，可以跳过。   </li>
+<li>排序 <br>距离由近到远排序。如果不需要，可以跳过。   </li>
+<li>分页 <br>如果需要2、3步，才需要对分页特殊处理。如果不需要，可以在第1步直接SQL分页。</li>
+</ol>
+<p>第1步数据库完成，后3步应用程序完成。</p>
+<p>为了方便下面说明，先给出一个初始表结构，我使用的是MySQL：</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180821084-1141286440.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="step1-搜索"><a href="#step1-搜索" class="headerlink" title="step1 搜索"></a>step1 搜索</h2><p>搜索可以用下面两种方式来实现。</p>
+<h3 id="区间查找"><a href="#区间查找" class="headerlink" title="区间查找"></a>区间查找</h3><p>customer表中使用两个字段存储了经度和纬度，如果提前计算出经纬度的范围，然后在这两个字段上加上索引，那搜索性能会很不错。 <br>那怎么计算出经纬度的范围呢？已知条件是移动设备所在的经纬度，还有满足业务要求的半径，这很像初中的一道平面几何题：给定圆心坐标和半径，求该圆外切正方形四个顶点的坐标。而我们面对的是一个球体，可以使用<a target="_blank" rel="noopener" href="https://github.com/locationtech/spatial4j">spatial4j</a>来计算。</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180905021-1403485682.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180929615-603715276.png" srcset="/img/loading.gif" lazyload></p>
+<p>geohash的原理不讲了，详细可以看<a target="_blank" rel="noopener" href="http://www.cnblogs.com/LBSer/p/3310455.html">这篇文章</a>，讲的很详细。geohash算法能把二维的经纬度编码成一维的字符串，它的特点是越相近的经纬度编码后越相似，所以可以通过前缀like的方式去匹配周围的商户。 <br>customer表要增加一个字段，来存储每个商户的geohash编码，并且建立索引。</p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022180956037-674314141.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181016802-1620997722.png" srcset="/img/loading.gif" lazyload></p>
+<p> <img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181042615-564048244.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181202224-1107522791.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2025/04/16/Mysql%E5%AE%9E%E7%8E%B0%E6%8C%89%E8%B7%9D%E7%A6%BB%E6%8E%92%E5%BA%8F%E3%80%81%E8%8C%83%E5%9B%B4%E6%9F%A5%E6%89%BE%20-%20%E5%88%98%E6%9B%99%E5%B0%98%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/1218828-20171022181224537-190479827.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="step3-排序"><a href="#step3-排序" class="headerlink" title="step3 排序"></a>step3 排序</h2><p>同样，排序也需要在应用程序中处理。排序基于上面的过滤结果做就可以了<code>Collections.sort(list, comparator)</code>。</p>
+<h2 id="step4-分页"><a href="#step4-分页" class="headerlink" title="step4 分页"></a>step4 分页</h2><p>如果需要2、3步，只能在内存中分页，做法也很简单，可以参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/ghsau/article/details/7243540">这篇文章</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>全文的重点都在于搜索如何实现，更好的利用数据库的索引，两种搜索方式以百万数据量为分割线，第一种适用于百万以下，第二种适用于百万以上，<code>未经过严格验证</code>。可能有人会有疑问，过滤和排序都在应用层做，内存占用会不会很严重？这是个潜在问题，但大多数情况下不会。看我们大部分的应用场景，都是单一种类POI(Point Of Interest)的搜索，如酒店、美食、KTV、电影院等等，这种数据密度是很小，1公里内的酒店，能有多少家，50家都算多的，所以最终要看具体业务数据密度。本文没有分析原理，只讲了具体实现，有关分析的文章可以看参考链接。</p>
+<hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="http://www.infoq.com/cn/articles/depth-study-of-Symfony2">http://www.infoq.com/cn/articles/depth-study-of-Symfony2</a> <br><a target="_blank" rel="noopener" href="http://tech.meituan.com/lucene-distance.html">http://tech.meituan.com/lucene-distance.html</a> <br><a target="_blank" rel="noopener" href="http://blog.csdn.net/liminlu0314/article/details/8553926">http://blog.csdn.net/liminlu0314/article/details/8553926</a> <br><a target="_blank" rel="noopener" href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates</a> <br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/LBSer/p/3310455.html">http://www.cnblogs.com/LBSer/p/3310455.html</a> <br><a target="_blank" rel="noopener" href="http://cevin.net/geohash/">http://cevin.net/geohash/</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/mysql/" class="category-chain-item">mysql</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/mysql/spatial4j/" class="category-chain-item">spatial4j</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/mysql/" class="print-no-link">#mysql</a>
+      
+        <a href="/tags/spatial4j/" class="print-no-link">#spatial4j</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Mysql实现按距离排序、范围查找</div>
+      <div>http://yaoliyc.github.io/2025/04/16/Mysql实现按距离排序、范围查找 - 刘曙尘 - 博客园/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/18/iOS%20AltStore%E4%BE%A7%E8%BD%BD%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" title="iOS AltStore侧载工具使用教程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">iOS AltStore侧载工具使用教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/15/%E5%85%B3%E4%BA%8Emysql%E5%81%9A%E8%B7%9D%E7%A6%BB%E7%AD%9B%E9%80%89%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%20-%20%E9%99%8D%E6%B8%A9%E4%BA%86%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD/" title="关于mysql做距离筛选的两种方法">
+                        <span class="hidden-mobile">关于mysql做距离筛选的两种方法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

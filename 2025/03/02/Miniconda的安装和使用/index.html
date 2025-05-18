@@ -1,0 +1,938 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Miniconda的安装和使用 Excerpt参考文献 Miniconda Anaconda 简介 Miniconda和Anaconda都是Python环境管理工具，可以用于创建、管理和部署Python环境及其依赖的软件包。它们的主要区别在于其默认安装的软件包和所需空间的大小。 Miniconda 是一个轻量级的Python环境管理工具，仅包括    参考文献 Miniconda Anaconda">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Miniconda的安装和使用">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/03/02/Miniconda%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="Miniconda的安装和使用 Excerpt参考文献 Miniconda Anaconda 简介 Miniconda和Anaconda都是Python环境管理工具，可以用于创建、管理和部署Python环境及其依赖的软件包。它们的主要区别在于其默认安装的软件包和所需空间的大小。 Miniconda 是一个轻量级的Python环境管理工具，仅包括    参考文献 Miniconda Anaconda">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-02T08:52:35.000Z">
+<meta property="article:modified_time" content="2025-03-02T09:29:34.715Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="conda">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Miniconda的安装和使用 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Miniconda的安装和使用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-02 16:52" pubdate>
+          2025年3月2日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Miniconda的安装和使用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Miniconda的安装和使用"><a href="#Miniconda的安装和使用" class="headerlink" title="Miniconda的安装和使用"></a>Miniconda的安装和使用</h1><blockquote>
+<h2 id="Excerpt"><a href="#Excerpt" class="headerlink" title="Excerpt"></a>Excerpt</h2><p>参考文献 Miniconda Anaconda 简介 Miniconda和Anaconda都是Python环境管理工具，可以用于创建、管理和部署Python环境及其依赖的软件包。它们的主要区别在于其默认安装的软件包和所需空间的大小。 Miniconda 是一个轻量级的Python环境管理工具，仅包括</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>参考文献</strong></p>
+<p><a target="_blank" rel="noopener" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> <a target="_blank" rel="noopener" href="https://www.anaconda.com/">Anaconda</a></p>
+</blockquote>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介#"></a>简介<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#%E7%AE%80%E4%BB%8B">#</a></h2><p><code>Miniconda</code>和<code>Anaconda</code>都是Python环境管理工具，可以用于创建、管理和部署Python环境及其依赖的软件包。它们的主要区别在于其默认安装的软件包和所需空间的大小。</p>
+<ul>
+<li><p>Miniconda 是一个轻量级的Python环境管理工具，仅包括conda、Python及其所需的基本依赖库。因此，它的安装包大小较小，只有几十兆，相比于Anaconda更加灵活。用户可以根据自己的需要逐步安装所需的软件包，避免不必要的浪费。在需要安装新软件包时，可以使用conda install命令来安装所需的软件包。这使得Miniconda在轻量化、快速安装、定制化、跨平台方面具有优势。</p>
+</li>
+<li><p>Anaconda 是一个包含了数百个预安装软件包的Python环境管理工具，包括Python解释器、各种科学计算和数据分析库、可视化工具、深度学习框架等。Anaconda旨在为数据科学家和研究者提供一个完整的数据科学环境，可以直接安装并使用大量的数据科学工具。这也意味着，Anaconda的安装包非常大，通常需要几个GB的磁盘空间，安装所需的时间也较长。同时，由于默认安装了大量的软件包，如果不需要的话，可能会浪费磁盘空间和内存资源。</p>
+</li>
+</ul>
+<p>综上所述，如果您需要一个灵活、快速、定制化的Python环境管理工具，并且希望自己安装所需的软件包，那么Miniconda可能更适合您。如果您需要一个预装有大量数据科学工具的环境，那么Anaconda可能更适合您。两者安装步骤几乎一致。</p>
+<h2 id="1-安装-Miniconda"><a href="#1-安装-Miniconda" class="headerlink" title="1. 安装 Miniconda#"></a>1. 安装 Miniconda<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#1-%E5%AE%89%E8%A3%85-miniconda">#</a></h2><h3 id="1-1-Windows下安装"><a href="#1-1-Windows下安装" class="headerlink" title="1.1 Windows下安装#"></a>1.1 Windows下安装<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#11-windows%E4%B8%8B%E5%AE%89%E8%A3%85">#</a></h3><p>在 Windows 系统下安装 Miniconda，可以按照以下步骤进行：</p>
+<ul>
+<li><p>首先，从官网下载适合你 Windows 系统的 Miniconda 安装程序：<a target="_blank" rel="noopener" href="https://docs.conda.io/en/latest/miniconda.html">https://docs.conda.io/en/latest/miniconda.html</a></p>
+</li>
+<li><p>下载完成后，双击安装程序并按照提示进行安装。</p>
+</li>
+<li><p>安装过程中需要阅读并同意许可协议。</p>
+</li>
+<li><p>安装过程中需要选择 Miniconda 的安装路径。默认情况下是在 <code>C:\Users\&lt;username&gt;\Miniconda3</code> 目录下创建一个名为 <code>Miniconda3</code> 的目录。你也可以选择其他路径，根据提示进行选择。</p>
+</li>
+</ul>
+<p>安装完成后，你就可以在终端中使用 conda 命令了，创建环境，安装依赖等操作都可以使用 conda 命令完成。</p>
+<h3 id="1-2-macOS下安装"><a href="#1-2-macOS下安装" class="headerlink" title="1.2 macOS下安装#"></a>1.2 macOS下安装<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#12-macos%E4%B8%8B%E5%AE%89%E8%A3%85">#</a></h3><p>在 macOS 系统下安装 Miniconda，可以按照以下步骤进行：</p>
+<ul>
+<li><p>首先，从官网下载适合你 macOS 系统的 Miniconda 安装程序：<a target="_blank" rel="noopener" href="https://docs.conda.io/en/latest/miniconda.html">https://docs.conda.io/en/latest/miniconda.html</a></p>
+</li>
+<li><p>下载完成后，双击安装程序并按照提示进行安装。</p>
+</li>
+<li><p>安装过程中需要阅读并同意许可协议。</p>
+</li>
+<li><p>安装过程中需要选择 Miniconda 的安装路径。默认情况下是在用户目录下创建一个名为 <code>miniconda3</code> 的目录。你也可以选择其他路径，根据提示进行选择。</p>
+</li>
+<li><p>安装完成后，需要在终端中运行以下命令，以便 Miniconda 的环境变量生效：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">source ~/.bash_profile<br></code></pre></td></tr></table></figure>
+
+<p>安装完成后，你就可以在终端中使用 conda 命令了，创建环境，安装依赖等操作都可以使用 conda 命令完成。</p>
+<h3 id="1-3-Linux下安装"><a href="#1-3-Linux下安装" class="headerlink" title="1.3 Linux下安装#"></a>1.3 Linux下安装<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#13-linux%E4%B8%8B%E5%AE%89%E8%A3%85">#</a></h3><p>在 Linux 下安装 Miniconda，可以按照以下步骤进行：</p>
+<ul>
+<li><p>首先，从官网下载适合你 Linux 系统的 Miniconda 安装程序：<a target="_blank" rel="noopener" href="https://docs.conda.io/en/latest/miniconda.html">https://docs.conda.io/en/latest/miniconda.html</a></p>
+</li>
+<li><p>打开终端，进入下载目录，执行以下命令，安装 Miniconda：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">bash Miniconda3-latest-Linux-x86_64.sh<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：如果你下载的是不同版本的安装程序，文件名也会有所不同，请根据你下载的版本自行更改文件名。</p>
+</blockquote>
+<ul>
+<li><p>执行安装命令后，会出现 Miniconda 许可协议的信息，按照提示阅读并同意协议，即输入<code>accept</code></p>
+</li>
+<li><p>接下来会提示你选择安装路径，默认情况下是在用户目录下创建一个名为 <code>miniconda3</code> 的目录。你也可以选择其他路径，根据提示进行选择。</p>
+</li>
+<li><p>安装完成后，终端中会出现提示，说明 Miniconda 已经安装成功。需要重新打开终端，以便 Miniconda 的环境变量生效。</p>
+</li>
+</ul>
+<p>安装完成后，你就可以在终端中使用 conda 命令了，创建环境，安装依赖等操作都可以使用 conda 命令完成。</p>
+<h2 id="2-配置-Miniconda"><a href="#2-配置-Miniconda" class="headerlink" title="2. 配置 Miniconda#"></a>2. 配置 Miniconda<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#2-%E9%85%8D%E7%BD%AE-miniconda">#</a></h2><ul>
+<li><p>打开终端或 Anaconda Prompt（Windows 用户）。</p>
+</li>
+<li><p>创建并激活 conda 环境：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda create --name env_name conda activate env_name<br></code></pre></td></tr></table></figure>
+
+<p>这里的 <code>env_name</code> 是你想要创建的环境名称。</p>
+<ul>
+<li>安装所需的包和工具：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda install package_name<br></code></pre></td></tr></table></figure>
+
+<p>这里的 package_name 是你想要安装的包名称。</p>
+<ul>
+<li>可以通过修改 .condarc 文件来修改默认的 conda 配置。</li>
+</ul>
+<blockquote>
+<p>conda 配置文件的路径:</p>
+<ul>
+<li><p>Linux&#x2F;macOS: <code>~/.condarc</code> 或 <code>$HOME/.condarc</code></p>
+</li>
+<li><p>Windows: <code>USERPROFILE%.condarc</code> 或 <code>C:\Users\username.condarc</code></p>
+</li>
+</ul>
+<p>其中，<code>%USERPROFILE%</code> 为 Windows 系统环境变量，表示当前用户的主目录路径，<code>username</code> 为当前用户名。</p>
+</blockquote>
+<h2 id="3-常用的-conda-命令"><a href="#3-常用的-conda-命令" class="headerlink" title="3. 常用的 conda 命令#"></a>3. 常用的 conda 命令<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#3-%E5%B8%B8%E7%94%A8%E7%9A%84-conda-%E5%91%BD%E4%BB%A4">#</a></h2><p>conda 是一个用于包管理和环境管理的工具，可以方便地创建、安装、升级和删除不同的软件包和其依赖项。以下是一些常用的 conda 命令：</p>
+<ul>
+<li>创建一个新的环境：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda create --name env_name<br></code></pre></td></tr></table></figure>
+
+<p><code>env_name</code> 为你想要创建的环境名称。</p>
+<ul>
+<li>激活一个环境：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda activate env_name<br></code></pre></td></tr></table></figure>
+
+<p><code>env_name</code> 为你想要激活的环境名称。</p>
+<ul>
+<li>在激活的环境中安装一个软件包：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda install package_name<br></code></pre></td></tr></table></figure>
+
+<p><code>package_name</code> 为你想要安装的软件包名称。</p>
+<ul>
+<li>列出当前环境中安装的所有软件包：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda list<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>列出所有可用的环境：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda env list<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>更新 conda：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda update conda<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>更新所有已安装的软件包：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda update --all<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>从环境中删除一个软件包：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda remove package_name<br></code></pre></td></tr></table></figure>
+
+<p><code>package_name</code> 为你想要删除的软件包名称。</p>
+<blockquote>
+<p>在使用conda创建虚拟环境时，默认会将虚拟环境的文件夹放在Anaconda&#x2F;Miniconda的安装路径下的envs文件夹中，具体路径为：</p>
+<ul>
+<li>Windows系统下：C:\Anaconda3\envs 或 C:\Users\你的用户名\Anaconda3\envs</li>
+<li>Linux&#x2F;Mac系统下：&#x2F;home&#x2F;你的用户名&#x2F;anaconda3&#x2F;envs 或 &#x2F;Users&#x2F;你的用户名&#x2F;anaconda3&#x2F;envs</li>
+</ul>
+</blockquote>
+<p>当然，你也可以使用conda config命令更改默认路径，例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda config --add envs_dirs /path/to/new/envs/folder<br></code></pre></td></tr></table></figure>
+
+<p>这个命令会在新路径下创建一个名为envs的文件夹，用来存储所有的虚拟环境。</p>
+<h2 id="4-conda-换源"><a href="#4-conda-换源" class="headerlink" title="4. conda 换源#"></a>4. conda 换源<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#4-conda-%E6%8D%A2%E6%BA%90">#</a></h2><p>如果你在使用 conda 时遇到网络问题，可以将 conda 的源换成清华源（<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/%EF%BC%89%E3%80%82%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4%E5%A6%82%E4%B8%8B%EF%BC%9A">https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/）。具体步骤如下：</a></p>
+<ul>
+<li><p>打开终端或 Anaconda Prompt。</p>
+</li>
+<li><p>在命令提示符中输入以下命令：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda config --show # 显示当前 conda 配置 conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ # 添加清华源的免费仓库 conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/ # 添加清华源的主要仓库 conda config --set show_channel_urls yes # 显示添加的所有仓库地址<br></code></pre></td></tr></table></figure>
+
+<p>这会将清华源添加到你的 conda 配置文件中。</p>
+<ul>
+<li><p>执行 <code>conda update conda</code> 命令，以确保你的 conda 版本是最新的。</p>
+</li>
+<li><p>如果你要创建新的环境或安装新的软件包，请使用以下命令：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda create --name env_name package_name<br></code></pre></td></tr></table></figure>
+
+<p><code>env_name</code> 为你想要创建的环境名称，<code>package_name</code> 为你想要安装的软件包名称。</p>
+<blockquote>
+<p>例如：<code>conda create -n pytorch python==3.8</code> 创建一个 pytorch 环境，pythoon 版本为3.8</p>
+</blockquote>
+<ul>
+<li>如果你需要取消这些换源更改，可以使用以下命令：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">conda config --remove-key channels # 移除添加的仓库地址 conda config --set show_channel_urls no # 不再显示仓库地址<br></code></pre></td></tr></table></figure>
+
+<p>除了清华源之外，还有不少其他的 conda 镜像源可以使用。以下是一些常用的 conda 镜像源及其地址：</p>
+<ul>
+<li>中科大镜像源：<a target="_blank" rel="noopener" href="https://mirrors.ustc.edu.cn/anaconda/pkgs/main/">https://mirrors.ustc.edu.cn/anaconda/pkgs/main/</a></li>
+<li>阿里云镜像源：<a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/anaconda/pkgs/main/">https://mirrors.aliyun.com/anaconda/pkgs/main/</a></li>
+<li>华为云镜像源：<a target="_blank" rel="noopener" href="https://mirrors.huaweicloud.com/repository/anaconda/pkgs/main/">https://mirrors.huaweicloud.com/repository/anaconda/pkgs/main/</a></li>
+<li>中国科学院开源协会镜像源：<a target="_blank" rel="noopener" href="https://mirrors.opencas.cn/anaconda/pkgs/main/">https://mirrors.opencas.cn/anaconda/pkgs/main/</a></li>
+<li>豆瓣镜像源：<a target="_blank" rel="noopener" href="https://pypi.douban.com/simple">https://pypi.douban.com/simple</a></li>
+</ul>
+<p>如果你想切换到其他镜像源，可以使用类似于切换清华源的方法，将需要的镜像源地址添加到 conda 配置文件中。</p>
+<blockquote>
+<p>需要注意的是，不同的镜像源可能会有不同的速度和可靠性，建议根据自己的网络情况选择合适的镜像源。</p>
+</blockquote>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结#"></a>5. 总结<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jijunhao/p/17235904.html#5-%E6%80%BB%E7%BB%93">#</a></h2><p>使用 conda 时，需要注意以下几点：</p>
+<ol>
+<li><strong>环境隔离</strong>：conda 可以创建虚拟环境来隔离不同的 Python 包和版本。在使用 conda 安装包时，需要确保安装在正确的环境中，以免出现冲突或版本不兼容的问题。可以使用 <code>conda env list</code> 查看当前存在的环境，使用 <code>conda activate env_name</code> 激活指定的环境。</li>
+<li><strong>版本管理</strong>：conda 可以安装不同版本的 Python 包和库，并且可以轻松地切换不同版本之间。在安装新包或更新已有包时，需要注意是否与当前环境中的其他包兼容。可以使用 <code>conda search package_name</code> 命令查询指定包的可用版本，使用 <code>conda install package_name=version</code> 命令安装指定版本的包。</li>
+<li><strong>包管理</strong>：conda 不仅可以安装 Python 包和库，还可以安装其他语言的依赖库和系统工具。在使用 conda 安装包时，需要注意包的来源和可靠性，以免下载和安装恶意软件。可以使用官方的 conda-forge 渠道来安装社区维护的包，也可以使用其他可信的镜像源。</li>
+<li><strong>配置管理</strong>：conda 可以通过配置文件来管理镜像源、默认安装路径、自动激活环境等设置。在使用 conda 时，需要注意配置文件是否正确，以免出现安装失败或异常的问题。可以使用 <code>conda config --show</code> 命令查看当前的配置信息，使用 <code>conda config --set key=value</code> 命令修改指定的配置项。</li>
+</ol>
+<p>总之，在使用 conda 时，需要仔细阅读文档，遵循最佳实践，以免出现不必要的问题。以上就是一些常用的 conda 小技巧。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/conda/" class="category-chain-item">conda</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/conda/Python/" class="category-chain-item">Python</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/conda/" class="print-no-link">#conda</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Miniconda的安装和使用</div>
+      <div>http://yaoliyc.github.io/2025/03/02/Miniconda的安装和使用/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/04/15/%E7%BB%8F%E7%BA%AC%E5%BA%A6%E8%AE%A1%E7%AE%97%E8%B7%9D%E7%A6%BB%20%20Mophei&#39;s%20blog/" title="经纬度计算距离">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">经纬度计算距离</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/" title="用好大模型?这5种实用的Prompt框架你一定要看看">
+                        <span class="hidden-mobile">用好大模型?这5种实用的Prompt框架你一定要看看</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,856 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果 Excerpt基于大模型的应用中，最大的需求应该就是RAG，里面涉及很多技术环节，本文主要讲述了其中的文本分块Chunking环节，包括为什么分块、分块的方法，以及一些工程化优化的方式。    本文主要内容：  RAG中涉及的技术环节  什么是分块  分块需要考虑的四种因素  分块的多种方法    RAG是一个考验技术的工">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果 Excerpt基于大模型的应用中，最大的需求应该就是RAG，里面涉及很多技术环节，本文主要讲述了其中的文本分块Chunking环节，包括为什么分块、分块的方法，以及一些工程化优化的方式。    本文主要内容：  RAG中涉及的技术环节  什么是分块  分块需要考虑的四种因素  分块的多种方法    RAG是一个考验技术的工">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg">
+<meta property="article:published_time" content="2025-02-24T02:38:52.000Z">
+<meta property="article:modified_time" content="2025-03-02T09:28:46.092Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Chunking">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-24 10:38" pubdate>
+          2025年2月24日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          31 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="最详细的文本分块-Chunking-方法——可以直接影响基于LLM应用效果"><a href="#最详细的文本分块-Chunking-方法——可以直接影响基于LLM应用效果" class="headerlink" title="最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果"></a>最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</h1><blockquote>
+<h2 id="Excerpt"><a href="#Excerpt" class="headerlink" title="Excerpt"></a>Excerpt</h2><p>基于大模型的应用中，最大的需求应该就是RAG，里面涉及很多技术环节，本文主要讲述了其中的文本分块Chunking环节，包括为什么分块、分块的方法，以及一些工程化优化的方式。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>本文主要内容：</p>
+<ul>
+<li><p>RAG中涉及的技术环节</p>
+</li>
+<li><p>什么是分块</p>
+</li>
+<li><p>分块需要考虑的四种因素</p>
+</li>
+<li><p>分块的多种方法</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="RAG是一个考验技术的工作"><a href="#RAG是一个考验技术的工作" class="headerlink" title="RAG是一个考验技术的工作"></a>RAG是一个考验技术的工作</h2><p>这两周发的文章大模型偏多，但如果你有阅读过前面的文章，你会发现我其实不是为了说大模型而说大模型（有点绕），我更多的是在写怎么解决企业应用中真正的难题。这个真正难题我在前面的文章中<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIyOTA5NTM1OA==&mid=2247484135&idx=1&sn=82e93f5c69f11b60f3e8bb1afb5d5107&chksm=e846a036df31292022d31320db7b50b381519d24d405489be821257df7deb9f95630f090f590&scene=21#wechat_redirect">《一些LLM的声音总结》</a>中提到过，基于大模型的企业应用中很大一部分需求就是RAG——检索增强生成。</p>
+<p><img src="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/640.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>这个流程依然无法描述RAG的复杂性  </p>
+<p>RAG涉及的内容其实广泛，包括Embedding、分词分块、检索召回（相似度匹配）、chat系统、ReAct和Prompt优化等，最后还有与LLM的交互，整个过程技术复杂度很高。如果你用的LLM非常好，反而大模型这一块是你最不需要关心的。而这些环节里面我们每个都没达到1（比如0.9、0.7…），那么最终的结果可能是这些小数点的乘积。如果我们每个环节都可以做到&gt;1.0，那么最终的结果会比上一个结果高出很多。</p>
+<p>今天我们来聊聊分块，很重要的一个环节（没有哪个环节不重要），但它也许是我们容易做到高质量的一个环节。</p>
+<h2 id="什么是分块？"><a href="#什么是分块？" class="headerlink" title="什么是分块？"></a>什么是分块？</h2><p>在构建RAG这类基于LLM的应用程序中，分块（chunking）是将大块文本分解成小段的过程。当我们使用LLM embedding内容时，这是一项必要的技术，可以帮助我们优化从向量数据库被召回的内容的准确性。在本文中，我们将探讨它是否以及如何帮助提高RAG应用程序的效率和准确性。</p>
+<p><img src="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>Pinecone是领先的向量数据库供应商  </p>
+<p>在向量数据库（如：Pinecone）中索引的任何内容都需要首先Embedding（可以看我上一篇文章<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIyOTA5NTM1OA==&mid=2247484246&idx=1&sn=c0b4f64e829bc336d516b4c79bbda19c&chksm=e846a187df31289169516fdf09ebfc3235dfcc11f467cf9541b022b2f3381a5c464db37f4da6&scene=21#wechat_redirect">大模型应用中大部分人真正需要去关心的核心——Embedding</a>）。分块的主要原因是尽量减少我们<strong>Embedding内容的噪音</strong>。</p>
+<p>例如，在语义搜索中，我们索引一个文档语料库，每个文档包含一个特定主题的有价值的信息。通过使用有效的分块策略，我们可以确保搜索结果准确地捕获用户查询的需求本质。如果我们的块太小或太大，可能会导致不精确的搜索结果或错过展示相关内容的机会。根据经验，如果文本块尽量是语义独立的，也就是没有对上下文很强的依赖，这样子对语言模型来说是最易于理解的。因此，为语料库中的文档<strong>找到最佳块大小对于确保搜索结果的准确性和相关性至关重要</strong>。</p>
+<p>另一个例子是会话Agent。我们使用embedding的块为基于知识库的会话agent构建上下文，该知识库将代理置于可信信息中。在这种情况下，对分块策略做出正确的选择很重要，原因有两个：</p>
+<ul>
+<li><p>首先，它将决定上下文是否与我们的prompt相关。</p>
+</li>
+<li><p>其次，考虑到我们可以为每个请求发送的tokens数量的限制，它将决定我们是否能够在将检索到的文本合并到prompt中发送到大模型(如OpenAI)。</p>
+</li>
+</ul>
+<p>在某些情况下，比如使用具有32k上下文窗口的GPT-4时，拟合块可能不是问题。尽管如此，当我们使用非常大的块时，我们需要注意，因为这可能会对我们从向量数据库获得的结果的相关性产生不利影响。</p>
+<p>在这篇文章中，我们将探讨几种分块方法，并讨论在选择分块大小和方法时应该考虑的权衡。最后，我们将给出一些建议，以确定适合您的应用程序的最佳块大小和方法。</p>
+<h2 id="Embedding长短内容"><a href="#Embedding长短内容" class="headerlink" title="Embedding长短内容"></a>Embedding长短内容</h2><p>当我们在嵌入内容（也就是embedding）时，我们可以根据内容是短（如句子）还是长（如段落或整个文档）来预测不同的行为。</p>
+<p>当嵌入一个<strong>句子</strong>时，生成的向量集中在句子的特定含义上。当与其他句子Embedding进行比较时，自然会在这个层次上进行比较。这也意味着Embedding可能会错过在段落或文档中找到的更广泛的上下文信息。</p>
+<p>当嵌入一个<strong>完整的段落或文档</strong>时，Embedding过程既要考虑整个上下文，也要考虑文本中句子和短语之间的关系。这可以产生更全面的向量表示，从而捕获文本的更广泛的含义和主题。另一方面，较大的输入文本大小可能会引入噪声或淡化单个句子或短语的重要性，从而在查询索引时更难以找到精确的匹配。</p>
+<p>查询的长度也会影响Embeddings之间的关系。较短的查询，如单个句子或短语，将专注于细节，可能更适合与句子级Embedding进行匹配。跨越多个句子或段落的较长的查询可能更适合段落或文档级别的Embedding，因为它可能会寻找更广泛的上下文或主题。</p>
+<p>索引也可能是非同质的，并且包含“不同”大小的块的Embedding。这可能会在查询结果相关性方面带来挑战，但也可能产生一些积极的后果。一方面，由于长内容和短内容的语义表示不一致，查询结果的相关性可能会波动。另一方面，非同构索引可能捕获更大范围的上下文和信息，因为不同的块大小表示文本中的不同粒度级别。这可以更灵活地容纳不同类型的查询。</p>
+<h2 id="分块需要考虑的因素"><a href="#分块需要考虑的因素" class="headerlink" title="分块需要考虑的因素"></a>分块需要考虑的因素</h2><p>在确定最佳分块策略时，有几个因素会对我们的选择起到至关重要的影响。以下是一些事实我们需要首先记在心里：</p>
+<ol>
+<li><p><strong>被索引内容的性质是什么?</strong> 这可能差别会很大，是处理较长的文档(如文章或书籍)，还是处理较短的内容(如微博或即时消息)？答案将决定哪种模型更适合您的目标，从而决定应用哪种分块策略。</p>
+</li>
+<li><p><strong>您使用的是哪种Embedding模型，它在多大的块大小上表现最佳？</strong>例如，sentence-transformer<del>[1]</del>模型在单个句子上工作得很好，但像<strong>text- embedt-ada -002</strong><del>[2]</del>这样的模型在包含256或512个tokens的块上表现得更好。</p>
+</li>
+<li><p><strong>你对用户查询的长度和复杂性有什么期望？</strong>用户输入的问题文本是简短而具体的还是冗长而复杂的？这也直接影响到我们选择分组内容的方式，以便在嵌入查询和嵌入文本块之间有更紧密的相关性。</p>
+</li>
+<li><p><strong>如何在您的特定应用程序中使用检索结果？</strong> 例如，它们是否用于<strong>语义搜索</strong>、<strong>问答</strong>、<strong>摘要</strong>或<strong>其他目的</strong>？例如，和你底层连接的LLM是有直接关系的，LLM的tokens限制会让你不得不考虑分块的大小。</p>
+</li>
+</ol>
+<p>没有最好的分块策略，只有适合的分块策略，为了确保查询结果更加准确，有时候我们甚至需要选择性地使用几种不同的策略。</p>
+<h2 id="分块的方法"><a href="#分块的方法" class="headerlink" title="分块的方法"></a>分块的方法</h2><p>分块有不同的方法，每种方法都可能适用于不同的情况。通过检查每种方法的优点和缺点，我们的目标是确定应用它们的正确场景。</p>
+<h3 id="固定大小分块"><a href="#固定大小分块" class="headerlink" title="固定大小分块"></a>固定大小分块</h3><p>这是最常见、最直接的分块方法：</p>
+<p>我们只需决定块中的tokens的数量，以及它们之间是否应该有任何重叠。一般来说，<strong>我们会在块之间保持一些重叠，以确保语义上下文不会在块之间丢失</strong>。在<strong>大多数情况下，固定大小的分块将是最佳方式</strong>。与其他形式的分块相比，固定大小的分块在计算上更加经济且易于使用，因为它在分块过程中不需要使用任何NLP库。</p>
+<p>下面是一个使用LangChain执行固定大小块处理的示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># your text</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> CharacterTextSplitter<br>text_splitter = CharacterTextSplitter(<br>    separator = <span class="hljs-string">&quot;\n\n&quot;</span>,<br>    chunk_size = <span class="hljs-number">256</span>,<br>    chunk_overlap  = <span class="hljs-number">20</span><br>)<br>docs = text_splitter.create_documents([text])<br></code></pre></td></tr></table></figure>
+
+<h3 id="Content-Aware：基于内容意图分块"><a href="#Content-Aware：基于内容意图分块" class="headerlink" title="Content-Aware：基于内容意图分块"></a>Content-Aware：基于内容意图分块</h3><p>这是一系列方法的组合，利用我们正在分块的内容的性质，并对其应用更复杂的分块。下面是一些例子:</p>
+<h4 id="句分割——Sentence-splitting"><a href="#句分割——Sentence-splitting" class="headerlink" title="句分割——Sentence splitting"></a>句分割——Sentence splitting</h4><p>正如我们之前提到的，许多模型都针对Embedding句子级内容进行了优化。当然，我们会使用句子分块，有几种方法和工具可以做到这一点，包括:</p>
+<ul>
+<li><strong>Naive splitting:</strong> 最幼稚的方法是用句号(。) 和 “换行”来分割句子。虽然这可能是快速和简单的，但这种方法不会考虑到所有可能的边缘情况。这里有一个非常简单的例子:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br>docs = text.split(<span class="hljs-string">&quot;.&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>NLTK</strong><del>[3]</del>: 自然语言工具包(NLTK)是一个流行的Python库，用于处理自然语言数据。它提供了一个句子标记器，可以将文本分成句子，帮助创建更有意义的分块。例如，要将NLTK与LangChain一起使用，您可以这样做:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> NLTKTextSplitter<br>text_splitter = NLTKTextSplitter()<br>docs = text_splitter.split_text(text)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>spaCy</strong><del>[4]</del>: spaCy是另一个用于NLP任务的强大Python库。它提供了一个复杂的句子分割功能，可以有效地将文本分成单独的句子，从而在生成的块中更好地保存上下文。例如，要将space与LangChain一起使用，您可以这样做:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> SpacyTextSplitter<br>text_splitter = SpaCyTextSplitter()<br>docs = text_splitter.split_text(text)<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>spacy-llm package  </p>
+<h4 id="递归分割"><a href="#递归分割" class="headerlink" title="递归分割"></a>递归分割</h4><p>递归分块使用一组分隔符以分层和迭代的方式将输入文本分成更小的块。如果分割文本开始的时候没有产生所需大小或结构的块，那么这个方法会使用不同的分隔符或标准对生成的块递归调用，直到获得所需的块大小或结构。这意味着虽然这些块的大小并不完全相同，但它们仍然会逼近差不多的大小。</p>
+<p>这里有一个例子，如何配合LangChain使用递归分块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">text = <span class="hljs-string">&quot;...&quot;</span> <span class="hljs-comment"># 你的文本</span><br><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> RecursiveCharacterTextSplitter<br>text_splitter = RecursiveCharacterTextSplitter(<br>    <span class="hljs-comment"># 设置一个非常小的块大小。</span><br>    chunk_size = <span class="hljs-number">256</span>,<br>    chunk_overlap  = <span class="hljs-number">20</span><br>)<br><br>docs = text_splitter.create_documents([text])<br></code></pre></td></tr></table></figure>
+
+<h4 id="专门的分块"><a href="#专门的分块" class="headerlink" title="专门的分块"></a>专门的分块</h4><p>Markdown和LaTeX是您可能遇到的结构化和格式化内容的两个例子。在这些情况下，可以使用专门的分块方法在分块过程中保留内容的原始结构。</p>
+<p><img src="/2025/02/24/%E6%9C%80%E8%AF%A6%E7%BB%86%E7%9A%84%E6%96%87%E6%9C%AC%E5%88%86%E5%9D%97(Chunking)%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E5%BD%B1%E5%93%8D%E5%9F%BA%E4%BA%8ELLM%E5%BA%94%E7%94%A8%E6%95%88%E6%9E%9C/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>本文就是用markdown写作的  </p>
+<ul>
+<li><strong>Markdown</strong>: Markdown是一种轻量级的标记语言，通常用于格式化文本。通过识别Markdown语法(例如，标题、列表和代码块)，您可以根据其结构和层次结构智能地划分内容，从而生成语义更连贯的块。例如:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> MarkdownTextSplitter<br>markdown_text = <span class="hljs-string">&quot;...&quot;</span><br><br>markdown_splitter = MarkdownTextSplitter(chunk_size=<span class="hljs-number">100</span>, chunk_overlap=<span class="hljs-number">0</span>)<br>docs = markdown_splitter.create_documents([markdown_text])<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>LaTex</strong>: LaTeX是一种文档准备系统和标记语言，通常用于学术论文和技术文档。通过解析LaTeX命令和环境，您可以创建尊重内容逻辑组织的块(例如，节、子节和方程)，从而产生更准确和上下文相关的结果。例如:</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.text_splitter <span class="hljs-keyword">import</span> LatexTextSplitter<br>latex_text = <span class="hljs-string">&quot;...&quot;</span><br>latex_splitter = LatexTextSplitter(chunk_size=<span class="hljs-number">100</span>, chunk_overlap=<span class="hljs-number">0</span>)<br>docs = latex_splitter.create_documents([latex_text])<br></code></pre></td></tr></table></figure>
+
+<h2 id="确定应用程序的最佳块大小"><a href="#确定应用程序的最佳块大小" class="headerlink" title="确定应用程序的最佳块大小"></a>确定应用程序的最佳块大小</h2><p>如果常见的分块方法(如固定分块)不容易适用于您的用例，这里有一些指针可以帮助您找到最佳的块大小。</p>
+<ul>
+<li><p><strong>清洗数据</strong> ：在确定应用程序的最佳块大小之前，您需要首先预处理清洗数据以确保质量。例如，如果您的数据是从web爬取的，您可能需要删除HTML标记或特定的元素，保证文本的“纯洁”，减少文本的噪音。</p>
+</li>
+<li><p><strong>选择一个范围的块大小</strong> ：一旦你的数据被预处理，下一步是选择一个范围的潜在块大小进行测试。如前所述，选择时应考虑内容的性质(例如短文本还是长文档)、将要使用的Embedding模型及其功能(如token限制)。目标是在保留上下文和保持准确性之间找到平衡。从探索各种块大小开始，包括较小的块(例如，128或256个tokens)用于捕获更细粒度的语义信息，较大的块(例如，512或1024个tokens)用于保留更多上下文。</p>
+</li>
+<li><p><strong>评估每个块大小的性能</strong> ：很傻，但是很稳重的一种方式。为了测试不同大小的块，您可以把不同大小的块进行标记。使用可以覆盖你的业务场景效果的数据集，为要测试的各个大小的块创建Embedding，并将它们保存下来。然后，你可以运行一系列查询来评估质量，并比较不同块大小的性能。这是一个反复测试的过程，在这个过程中，针对不同的查询测试不同的块大小，直到找到最佳的块大小。</p>
+</li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>好了，说了这么多，最后我要说的结论你可能会失望，那就是我们自己也还没有找到最佳的分块方式，哈哈。但是对于不同的业务场景，我们现在比刚开始做RAG应用的时候会有经验很多了。</p>
+<blockquote>
+<p>引用：</p>
+<p><em>1.sentence-transformer：<a target="_blank" rel="noopener" href="https://huggingface.co/sentence-transformers">https://huggingface.co/sentence-transformers</a></em></p>
+<p><em>2.text- embedt-ada -002：<a target="_blank" rel="noopener" href="https://openai.com/blog/new-and-improved-embedding-model">https://openai.com/blog/new-and-improved-embedding-model</a></em></p>
+<p><em>3.NLTK：<a target="_blank" rel="noopener" href="https://www.nltk.org/">https://www.nltk.org/</a></em></p>
+<p><em>4.spaCy：<a target="_blank" rel="noopener" href="https://spacy.io/">https://spacy.io/</a></em></p>
+<p><em>5.Chunking Strategies for LLM Applications：<a target="_blank" rel="noopener" href="https://www.pinecone.io/learn/chunking-strategies/">https://www.pinecone.io/learn/chunking-strategies/</a></em></p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RAG/" class="category-chain-item">RAG</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/RAG/" class="print-no-link">#RAG</a>
+      
+        <a href="/tags/Chunking/" class="print-no-link">#Chunking</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果</div>
+      <div>http://yaoliyc.github.io/2025/02/24/最详细的文本分块(Chunking)方法——可以直接影响基于LLM应用效果/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/24/Rerank%E2%80%94%E2%80%94RAG%E4%B8%AD%E7%99%BE%E5%B0%BA%E7%AB%BF%E5%A4%B4%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A5%9E%E5%99%A8%EF%BC%8C%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Rerank——RAG中百尺竿头更进一步的神器，从原理到解决方案</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/24/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E4%B8%AD%E5%A4%A7%E9%83%A8%E5%88%86%E4%BA%BA%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E5%8E%BB%E5%85%B3%E5%BF%83%E7%9A%84%E6%A0%B8%E5%BF%83%E2%80%94%E2%80%94Embedding/" title="大模型应用中大部分人真正需要去关心的核心——Embedding">
+                        <span class="hidden-mobile">大模型应用中大部分人真正需要去关心的核心——Embedding</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

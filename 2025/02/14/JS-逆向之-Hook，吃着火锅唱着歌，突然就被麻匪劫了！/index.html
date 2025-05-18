@@ -1,0 +1,940 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！ ExcerptJS 逆向中什么是 Hook？吃着火锅唱着歌，突然就被麻匪劫了！这就是 Hook！    点击上方「蓝字」关注我们   什么是 Hook？Hook 中文译为钩子，Hook 实际上是 Windows 中提供的一种用以替换 DOS 下“中断”的系统机制，Hook 的概念在 Windows 桌面软件开发很常见，特别是各种事件触发的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！ ExcerptJS 逆向中什么是 Hook？吃着火锅唱着歌，突然就被麻匪劫了！这就是 Hook！    点击上方「蓝字」关注我们   什么是 Hook？Hook 中文译为钩子，Hook 实际上是 Windows 中提供的一种用以替换 DOS 下“中断”的系统机制，Hook 的概念在 Windows 桌面软件开发很常见，特别是各种事件触发的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.gif">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.1.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.2.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.3.webp">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/JS%20%E9%80%86%E5%90%91%E4%B9%8B%20Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg%253E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg">
+<meta property="article:published_time" content="2025-02-14T02:01:33.000Z">
+<meta property="article:modified_time" content="2025-03-02T08:58:31.569Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="hook">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.gif">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！ - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-14 10:01" pubdate>
+          2025年2月14日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          82 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="JS-逆向之-Hook，吃着火锅唱着歌，突然就被麻匪劫了！"><a href="#JS-逆向之-Hook，吃着火锅唱着歌，突然就被麻匪劫了！" class="headerlink" title="JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！"></a>JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！</h1><blockquote>
+<h2 id="Excerpt"><a href="#Excerpt" class="headerlink" title="Excerpt"></a>Excerpt</h2><p>JS 逆向中什么是 Hook？吃着火锅唱着歌，突然就被麻匪劫了！这就是 Hook！</p>
+</blockquote>
+<hr>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.gif" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>点击上方「蓝字」关注我们</p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.1.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.2.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<h2 id="什么是-Hook？"><a href="#什么是-Hook？" class="headerlink" title="什么是 Hook？"></a>什么是 Hook？</h2><p>Hook 中文译为钩子，Hook 实际上是 Windows 中提供的一种用以替换 DOS 下“中断”的系统机制，Hook 的概念在 Windows 桌面软件开发很常见，特别是各种事件触发的机制，在对特定的系统事件进行 Hook 后，一旦发生已 Hook 事件，对该事件进行 Hook 的程序就会收到系统的通知，这时程序就能在第一时间对该事件做出响应。在程序中将其理解为“劫持”可能会更好理解，我们可以通过 Hook 技术来劫持某个对象，把某个对象的程序拉出来替换成我们自己改写的代码片段，修改参数或替换返回值，从而控制它与其他对象的交互。</p>
+<p>通俗来讲，Hook 其实就是拦路打劫，马邦德带着老婆，出了城，吃着火锅，还唱着歌，突然就被麻匪劫了，张麻子劫下县长马邦德的火车，摇身一变化身县长，带着手下赶赴鹅城上任。Hook 的过程，就是张麻子顶替马邦德的过程。</p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/640.3.webp" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<h2 id="JS-逆向中的-Hook"><a href="#JS-逆向中的-Hook" class="headerlink" title="JS 逆向中的 Hook"></a>JS 逆向中的 Hook</h2><p>在 JavaScript 逆向中，替换原函数的过程都可以被称为 Hook，以下先用一段简单的代码理解 Hook 的过程：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>a<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>a.&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>a<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>b<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>b.&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>a()<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>b.<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>直接覆盖原函数是最简单的做法，以上代码将 a 函数进行了重写，再次调用 a 函数将会输出 <code>I&#39;m b.</code>，如果还想执行原来 <code>a</code> 函数的内容，可以使用中间变量进行储存：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>a<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>a.&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>c<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>a;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>a<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>b<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>b.&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>a()<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>b.<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>c()<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>I&#x27;m<span class="hljs-symbol">&amp;nbsp;</span>a.<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>此时，调用 a 函数会输出 <code>I&#39;m b.</code>，调用 c 函数会输出 <code>I&#39;m a.</code>。</p>
+<p>这种原函数直接覆盖的方法通常只用来进行临时调试，实用性不大，但是它能够帮助我们理解 Hook 的过程，在实际 JS 逆向过程中，我们会用到更加高级一点的方法，比如 <code>Object.defineProperty()</code>。</p>
+<h2 id="Object-defineProperty"><a href="#Object-defineProperty" class="headerlink" title="Object.defineProperty()"></a>Object.defineProperty()</h2><p>基本语法：<code>Object.defineProperty(obj, prop, descriptor)</code>，它的作用就是直接在一个对象上定义一个新属性，或者修改一个对象的现有属性，接收的三个参数含义如下：</p>
+<p><code>obj</code>：需要定义属性的当前对象；</p>
+<p><code>prop</code>：当前需要定义的属性名；</p>
+<p><code>descriptor</code>：属性描述符，可以取以下值：</p>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>默认值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>get</td>
+<td>undefined</td>
+<td>存取描述符，目标属性获取值的方法</td>
+</tr>
+<tr>
+<td>set</td>
+<td>undefined</td>
+<td>存取描述符，目标属性设置值的方法</td>
+</tr>
+<tr>
+<td>value</td>
+<td>undefined</td>
+<td>数据描述符，设置属性的值</td>
+</tr>
+<tr>
+<td>writable</td>
+<td>false</td>
+<td>数据描述符，目标属性的值是否可以被重写</td>
+</tr>
+<tr>
+<td>enumerable</td>
+<td>false</td>
+<td>目标属性是否可以被枚举</td>
+</tr>
+<tr>
+<td>configurable</td>
+<td>false</td>
+<td>目标属性是否可以被删除或是否可以再次修改特性</td>
+</tr>
+</tbody></table>
+<p>通常情况下，对象的定义与赋值是这样的：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>people<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>&#123;&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>people.name<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Bob&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>people[<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;age&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>]<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;18&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(people)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-symbol">&amp;nbsp;</span>name:<span class="hljs-symbol">&amp;nbsp;</span>&#x27;Bob&#x27;,<span class="hljs-symbol">&amp;nbsp;</span>age:<span class="hljs-symbol">&amp;nbsp;</span>&#x27;18&#x27;<span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>使用 <code>Object.defineProperty()</code> 方法：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>people<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>&#123;&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(people,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;name&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Bob&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>writable<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>是否可以被重写<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(people.name)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>&#x27;Bob&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>people.name<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Tom&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(people.name)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>&#x27;Tom&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在 Hook 中，使用最多的是存取描述符，即 get 和 set。</p>
+<p><strong>get</strong>：属性的 getter 函数，如果没有 getter，则为 undefined，当访问该属性时，会调用此函数，执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的 this 并不一定是定义该属性的对象），该函数的返回值会被用作属性的值。</p>
+<p><strong>set</strong>：属性的 setter 函数，如果没有 setter，则为 undefined，当属性值被修改时，会调用此函数，该方法接受一个参数，也就是被赋予的新值，会传入赋值时的 this 对象。</p>
+<p>用一个例子来演示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>people<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>name<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Bob&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>count<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>18<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>定义一个<span class="hljs-symbol">&amp;nbsp;</span>age<span class="hljs-symbol">&amp;nbsp;</span>获取值时返回定义好的变量<span class="hljs-symbol">&amp;nbsp;</span>count<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(people,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;age&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;获取值！&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>count;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>set<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>val<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;设置值！&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>count<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>val<span class="hljs-symbol">&amp;nbsp;</span>+<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(people.age);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>people.age<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>20<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(people.age);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">获取值！<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>18<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>设置值！<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>获取值！<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>21<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>通过这样的方法，我们就可以在设置某个值的时候，添加一些代码，比如 <code>debugger;</code>，让其断下，然后利用调用栈进行调试，找到参数加密、或者参数生成的地方，需要注意的是，网站加载时首先要运行我们的 Hook 代码，再运行网站自己的代码，才能够成功断下，这个过程我们可以称之为 Hook 代码的注入，以下将介绍几种主流的注入方法。</p>
+<h2 id="Hook-注入的几种方法"><a href="#Hook-注入的几种方法" class="headerlink" title="Hook 注入的几种方法"></a>Hook 注入的几种方法</h2><p>以下以某奇艺 cookie 中的  <code>__dfp</code>  值为例，来演示具体如何注入 Hook。</p>
+<h3 id="1、Fiddler-插件注入"><a href="#1、Fiddler-插件注入" class="headerlink" title="1、Fiddler 插件注入"></a>1、Fiddler 插件注入</h3><p>来到某奇艺首页，可以看到其 cookie 里面有个 <code>__dfp</code> 值：</p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>如果直接搜索是搜不到的，我们想通过 Hook 的方式，让在生成 <code>__dfp</code> 值的地方断下，就可以编写如下自执行函数：  </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;use<span class="hljs-symbol">&amp;nbsp;</span>strict&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>set<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>val<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(val.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;__dfp&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Hook捕获到cookie设置-<span class="hljs-symbol">&amp;gt;</span>&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>val);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>if (val.indexOf(&#39;__dfp&#39;) != -1) &#123;debugger;&#125;</code> 的意思是检索 <code>__dfp</code> 在字符串中首次出现的位置，等于 -1 表示这个字符串值没有出现，反之则出现。如果出现了，那么就 debugger 断下，这里要注意的是不能写成 <code>if (val == &#39;__dfp&#39;) &#123;debugger&#125;</code>，因为 val 传过来的值类似于 <code>__dfp=xxxxxxxxxx</code>，这样写是无法断下的。</p>
+<p>有了代码该如何使用呢？也就是怎么注入 Hook 代码呢？这里推荐 Fiddler 抓包工具搭配编程猫的插件使用，插件可以在公众号输入关键字【<strong>Fiddler插件</strong>】获取，其原理可以理解为拦截 —&gt; 加工 —&gt; 放行的一个过程，利用 Fiddler 替换响应，在 Fiddler 拦截到数据后，在源码第一行插入 Hook 代码，由于 Hook 代码是一个自执行函数，那么网页一旦加载，就必然会先运行 Hook 代码。安装完成后如下图所示，打开抓包，点击开启注入 Hook：</p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>浏览器清除 cookie 后重新进入某奇艺的页面，可以看到成功断下，在 console 控制台可以看到捕获的一些 cookie 值，此时的 <code>val</code> 就是 <code>__dfp</code> 的值，接下来在右侧的 Call Stack 调用栈里就可以看到一些函数的调用过程，依次向上跟进就能够找到最开始 <code>__dfp</code> 生成的地方。  </p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<h3 id="2、TamperMonkey-注入"><a href="#2、TamperMonkey-注入" class="headerlink" title="2、TamperMonkey 注入"></a>2、TamperMonkey 注入</h3><p>TamperMonkey 俗称油猴插件，是一款免费的浏览器扩展和最为流行的用户脚本管理器，支持很多主流的浏览器， 包括 Chrome、Microsoft Edge、Safari、Opera、Firefox、UC 浏览器、360 浏览器、QQ 浏览器等等，基本上实现了脚本的一次编写，所有平台都能运行，可以说是基于浏览器的应用算是真正的跨平台了。用户可以在 GreasyFork、OpenUserJS 等平台直接获取别人发布的脚本，功能众多且强大，比如视频解析、去广告等。</p>
+<p>我们依旧以某奇艺的 cookie 为例来演示如何编写 TamperMonkey 脚本，首先去应用商店安装 TamperMonkey，安装过程不再赘述，然后点击图标，添加新脚本，或者点击管理面板，再点击加号新建脚本，写入以下代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>==UserScript==<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@name<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>Cookie<span class="hljs-symbol">&amp;nbsp;</span>Hook<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@namespace<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>http://tampermonkey.net/<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@version<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>0.1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@description<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>Cookie<span class="hljs-symbol">&amp;nbsp;</span>Hook<span class="hljs-symbol">&amp;nbsp;</span>脚本示例<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@author<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>K哥爬虫<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@match<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>*<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@icon<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>https://www.kuaidaili.com/img/favicon.ico<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@grant<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>none<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>@run-at<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>document-start<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>==/UserScript==<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;use<span class="hljs-symbol">&amp;nbsp;</span>strict&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>set<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>val<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(val.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;__dfp&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Hook捕获到cookie设置-<span class="hljs-symbol">&amp;gt;</span>&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>val);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>主体的 JavaScript 自执行函数和前面都是一样的，这里需要注意的是最前面的注释，每个选项都是有意义的，所有的选项参考 TamperMonkey 官方文档<sup>[1]</sup>，以下列出了比较常用、比较重要的部分选项（其中需要特别注意 <code>@match</code>、<code>@include</code> 和 <code>@run-at</code>选项）：</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@name</td>
+<td>脚本的名称</td>
+</tr>
+<tr>
+<td>@namespace</td>
+<td>命名空间，用来区分相同名称的脚本，一般写作者名字或者网址就可以</td>
+</tr>
+<tr>
+<td>@version</td>
+<td>脚本版本，油猴脚本的更新会读取这个版本号</td>
+</tr>
+<tr>
+<td>@description</td>
+<td>描述这个脚本是干什么用的</td>
+</tr>
+<tr>
+<td>@author</td>
+<td>编写这个脚本的作者的名字</td>
+</tr>
+<tr>
+<td><strong>@match</strong></td>
+<td>从字符串的起始位置匹配正则表达式，只有匹配的网址才会执行对应的脚本，例如 <code>*</code> 匹配所有，<code>https://www.baidu.com/*</code> 匹配百度等，可以参考 Python re 模块里面的 <code>re.match()</code> 方法，允许多个实例</td>
+</tr>
+<tr>
+<td><strong>@include</strong></td>
+<td>和 @match 类似，只有匹配的网址才会执行对应的脚本，但是 @include 不会从字符串起始位置匹配，例如 <code>*://*baidu.com/*</code> 匹配百度，具体区别可以参考TamperMonkey 官方文档[1]</td>
+</tr>
+<tr>
+<td>@icon</td>
+<td>脚本的 icon 图标</td>
+</tr>
+<tr>
+<td>@grant</td>
+<td>指定脚本运行所需权限，如果脚本拥有相应的权限，就可以调用油猴扩展提供的 API 与浏览器进行交互。如果设置为 none 的话，则不使用沙箱环境，脚本会直接运行在网页的环境中，这时候无法使用大部分油猴扩展的 API。如果不指定的话，油猴会默认添加几个最常用的 API</td>
+</tr>
+<tr>
+<td>@require</td>
+<td>如果脚本依赖其他 JS 库的话，可以使用 require 指令导入，在运行脚本之前先加载其它库</td>
+</tr>
+<tr>
+<td><strong>@run-at</strong></td>
+<td>脚本注入时机，该选项是能不能 hook 到的关键，有五个值可选：<code>document-start</code>：网页开始时；<code>document-body</code>：body出现时；<code>document-end</code>：载入时或者之后执行；<code>document-idle</code>：载入完成后执行，默认选项；<code>context-menu</code>：在浏览器上下文菜单中单击该脚本时，一般将其设置为 <code>document-start</code></td>
+</tr>
+</tbody></table>
+<p>清除 cookie，开启 TamperMonkey 插件，再次来到某奇艺首页，可以看到也成功被断下，同样的也可以跟进调用栈来进一步分析  <code>__dfp</code> 值的来源。</p>
+<p><img src="/JS%20%E9%80%86%E5%90%91%E4%B9%8B%20Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg%253E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<h3 id="3、浏览器插件注入"><a href="#3、浏览器插件注入" class="headerlink" title="3、浏览器插件注入"></a>3、浏览器插件注入</h3><p>浏览器插件官方叫法应该是浏览器扩展（Extension），浏览器插件能够增强浏览器功能，同样也能够帮助我们 Hook，浏览器插件的编写并不复杂，以 Chrome 插件为例，只需要保证项目下有一个 manifest.json 文件即可，它用来设置所有和插件相关的配置，必须放在根目录。其中 <code>manifest_version</code>、<code>name</code>、<code>version</code> 3个参数是必不可少的，如果想要深入学习，可以参考小茗同学<sup>[2]</sup>的博客和 Google 官方文档<sup>[3]</sup>。需要注意的是，火狐浏览器插件不一定能在其他浏览器上运行，而 Chrome 插件除了能运行在 Chrome 浏览器之外，还可以运行在所有 webkit 内核的国产浏览器，比如 360 极速浏览器、360 安全浏览器、搜狗浏览器、QQ 浏览器等等。我们还是以某奇艺的 cookie 来演示如何编写一个 Chrome 浏览器 Hook 插件。</p>
+<p>新建 manifest.json 文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;name&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Cookie<span class="hljs-symbol">&amp;nbsp;</span>Hook&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>插件名称<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;version&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;1.0&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>插件版本<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;description&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Cookie<span class="hljs-symbol">&amp;nbsp;</span>Hook&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>插件描述<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;manifest_version&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>2<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>清单版本，必须是2或者3<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;content_scripts&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>[&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;matches&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;<span class="hljs-symbol">&amp;lt;</span>all_urls<span class="hljs-symbol">&amp;gt;</span>&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>],<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>匹配所有地址<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;js&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;cookie_hook.js&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>],<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>注入的代码文件名和路径，如果有多个，则依次注入<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;all_frames&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>允许将内容脚本嵌入页面的所有框架中<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;permissions&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;tabs&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>],<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>权限申请，tabs<span class="hljs-symbol">&amp;nbsp;</span>表示标签<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;run_at&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;document_start&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>代码注入的时间<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;]<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>新建 cookie_hook.js 文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>hook<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;use<span class="hljs-symbol">&amp;nbsp;</span>strict&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>set<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>val<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(val.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;__dfp&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Hook捕获到cookie设置-<span class="hljs-symbol">&amp;gt;</span>&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>val);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>script<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.createElement(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;script&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>script.textContent<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;(&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>+<span class="hljs-symbol">&amp;nbsp;</span>hook<span class="hljs-symbol">&amp;nbsp;</span>+<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;)()&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.head<span class="hljs-symbol">&amp;nbsp;</span>||<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.documentElement).appendChild(script);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>script.parentNode.removeChild(script);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>将这两个文件放到同一个文件夹，打开 chrome 的扩展程序, 打开开发者模式，加载已解压的扩展程序，选择创建的文件夹即可：</p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<p>来到某奇艺页面，清除 cookie 后重新进入，可以看到同样也成功断下，跟踪调用栈就可以找到其值生成的地方：  </p>
+<p><img src="/2025/02/14/JS-%E9%80%86%E5%90%91%E4%B9%8B-Hook%EF%BC%8C%E5%90%83%E7%9D%80%E7%81%AB%E9%94%85%E5%94%B1%E7%9D%80%E6%AD%8C%EF%BC%8C%E7%AA%81%E7%84%B6%E5%B0%B1%E8%A2%AB%E9%BA%BB%E5%8C%AA%E5%8A%AB%E4%BA%86%EF%BC%81/svg_3E.svg" srcset="/img/loading.gif" lazyload alt="图片"></p>
+<h2 id="常用-Hook-代码总汇"><a href="#常用-Hook-代码总汇" class="headerlink" title="常用 Hook 代码总汇"></a>常用 Hook 代码总汇</h2><p>除了使用上述的 <code>Object.defineProperty()</code> 方法，还可以直接捕获相关接口，然后重写这个接口，以下列出了常见的 Hook 代码。注意：以下只是关键的 Hook 代码，具体注入的方式不同，要进行相关的修改。</p>
+<h3 id="Hook-Cookie"><a href="#Hook-Cookie" class="headerlink" title="Hook Cookie"></a>Hook Cookie</h3><p>Cookie Hook 用于定位 Cookie 中关键参数生成位置，以下代码演示了当 Cookie 中匹配到了 <code>__dfp</code> 关键字， 则插入断点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;use<span class="hljs-symbol">&amp;nbsp;</span>strict&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>set<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>val<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(val.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;__dfp&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Hook捕获到cookie设置-<span class="hljs-symbol">&amp;gt;</span>&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>val);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>val;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>cookieTemp;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;,<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;use<span class="hljs-symbol">&amp;nbsp;</span>strict&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>org<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.cookie.__lookupSetter__(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__defineSetter__(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>cookie<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(cookie.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;__dfp&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>org<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>cookie;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>document<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__defineGetter__(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;cookie&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>org;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-Header"><a href="#Hook-Header" class="headerlink" title="Hook Header"></a>Hook Header</h3><p>Header Hook 用于定位 Header 中关键参数生成位置，以下代码演示了当 Header 中包含 <code>Authorization</code> 关键字时，则插入断点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>org<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.XMLHttpRequest.prototype.setRequestHeader;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.XMLHttpRequest.prototype.setRequestHeader<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>key,<span class="hljs-symbol">&amp;nbsp;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(key<span class="hljs-symbol">&amp;nbsp;</span>==<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Authorization&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>org.apply(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>this<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-URL"><a href="#Hook-URL" class="headerlink" title="Hook URL"></a>Hook URL</h3><p>URL Hook 用于定位请求 URL 中关键参数生成位置，以下代码演示了当请求的 URL 里包含 <code>login</code> 关键字时，则插入断点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>open<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.XMLHttpRequest.prototype.open;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.XMLHttpRequest.prototype.open<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>method,<span class="hljs-symbol">&amp;nbsp;</span>url,<span class="hljs-symbol">&amp;nbsp;</span>async<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>if<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>(url.indexOf(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;login&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>!=<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>open.apply(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>this<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-JSON-stringify"><a href="#Hook-JSON-stringify" class="headerlink" title="Hook JSON.stringify"></a>Hook JSON.stringify</h3><p><code>JSON.stringify()</code> 方法用于将 JavaScript 值转换为 JSON 字符串，在某些站点的加密过程中可能会遇到，以下代码演示了遇到 <code>JSON.stringify()</code> 时，则插入断点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>stringify<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>JSON<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.stringify;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>JSON<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.stringify<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>params<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Hook<span class="hljs-symbol">&amp;nbsp;</span>JSON.stringify<span class="hljs-symbol">&amp;nbsp;</span>——<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>params);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>stringify(params);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-JSON-parse"><a href="#Hook-JSON-parse" class="headerlink" title="Hook  JSON.parse"></a>Hook  JSON.parse</h3><p><code>JSON.parse()</code> 方法用于将一个 JSON 字符串转换为对象，在某些站点的加密过程中可能会遇到，以下代码演示了遇到 <code>JSON.parse()</code> 时，则插入断点：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>parse<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>JSON<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.parse;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>JSON<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.parse<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>params<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;Hook<span class="hljs-symbol">&amp;nbsp;</span>JSON.parse<span class="hljs-symbol">&amp;nbsp;</span>——<span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;nbsp;</span>&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>params);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>parse(params);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-eval"><a href="#Hook-eval" class="headerlink" title="Hook eval"></a>Hook eval</h3><p>JavaScript <code>eval()</code> 函数的作用是计算 JavaScript 字符串，并把它作为脚本代码来执行。如果参数是一个表达式，<code>eval()</code> 函数将执行表达式。如果参数是 Javascript 语句，<code>eval()</code> 将执行 Javascript 语句，经常被用来动态执行 JS。以下代码执行后，之后所有的 <code>eval()</code> 操作都会在控制台打印输出将要执行的 JS 源码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>保存原始方法<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_eval<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.eval;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>重写<span class="hljs-symbol">&amp;nbsp;</span>eval<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>myeval<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>src<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(src);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;===============<span class="hljs-symbol">&amp;nbsp;</span>eval<span class="hljs-symbol">&amp;nbsp;</span>end<span class="hljs-symbol">&amp;nbsp;</span>===============&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_eval(src);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>屏蔽<span class="hljs-symbol">&amp;nbsp;</span>JS<span class="hljs-symbol">&amp;nbsp;</span>中对原生函数<span class="hljs-symbol">&amp;nbsp;</span>native<span class="hljs-symbol">&amp;nbsp;</span>属性的检测<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>_myeval<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span>myeval.bind(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>null<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>_myeval.toString<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_eval.toString;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;eval&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>_myeval<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Hook-Function"><a href="#Hook-Function" class="headerlink" title="Hook Function"></a>Hook Function</h3><p>以下代码执行后，所有的函数操作都会在控制台打印输出将要执行的 JS 源码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>保存原始方法<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_fun<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.Function;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>重写<span class="hljs-symbol">&amp;nbsp;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>myfun<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>var<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span>args<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Array<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.prototype.slice.call(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>0<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>-1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>).join(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;,&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>),<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>src<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>[<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.length<span class="hljs-symbol">&amp;nbsp;</span>-<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>1<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>];<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(src);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>console<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.log(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;===============<span class="hljs-symbol">&amp;nbsp;</span>Function<span class="hljs-symbol">&amp;nbsp;</span>end<span class="hljs-symbol">&amp;nbsp;</span>===============&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>debugger<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_fun.apply(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>this<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>arguments<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>//<span class="hljs-symbol">&amp;nbsp;</span>屏蔽js中对原生函数native属性的检测<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>myfun.toString<span class="hljs-symbol">&amp;nbsp;</span>=<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>function<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>)<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>return<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.__cr_fun<span class="hljs-symbol">&amp;nbsp;</span>+<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&quot;&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Object<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>.defineProperty(<span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>window<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>&#x27;Function&#x27;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>,<span class="hljs-symbol">&amp;nbsp;</span>&#123;<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>value<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>:<span class="hljs-symbol">&amp;nbsp;</span>myfun<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span><span class="hljs-symbol">&amp;nbsp;</span>&#125;);<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span>&#125;)();<span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>[1]</p>
+<p>TamperMonkey 官方文档: <em><a target="_blank" rel="noopener" href="https://www.tampermonkey.net/documentation.php">https://www.tampermonkey.net/documentation.php</a></em></p>
+<p>[2]</p>
+<p>小茗同学: <em><a target="_blank" rel="noopener" href="https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html">https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html</a></em></p>
+<p>[3]</p>
+<p>Google 官方文档: <em><a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/extensions/">https://developer.chrome.com/docs/extensions/</a></em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/" class="print-no-link">#爬虫</a>
+      
+        <a href="/tags/hook/" class="print-no-link">#hook</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JS 逆向之 Hook，吃着火锅唱着歌，突然就被麻匪劫了！</div>
+      <div>http://yaoliyc.github.io/2025/02/14/JS-逆向之-Hook，吃着火锅唱着歌，突然就被麻匪劫了！/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/14/%E7%88%AC%E8%99%AB%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80%EF%BC%8C%E7%90%86%E8%A7%A3-JavaScript-%E6%A8%A1%E5%9D%97%E5%8C%96%E7%BC%96%E7%A8%8B-webpack/" title="爬虫逆向基础，理解 JavaScript 模块化编程 webpack">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">爬虫逆向基础，理解 JavaScript 模块化编程 webpack</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/14/%E3%80%90%E7%88%AC%E8%99%AB%E7%9F%A5%E8%AF%86%E3%80%91%E6%B5%8F%E8%A7%88%E5%99%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7%E6%80%BB%E7%BB%93/" title="【爬虫知识】浏览器开发者工具使用技巧总结">
+                        <span class="hidden-mobile">【爬虫知识】浏览器开发者工具使用技巧总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,835 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="屹">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="用好大模型?这5种实用的Prompt框架你一定要看看!前言大模型正为我们带来前所未有的技术革新，而用好大模型也是有一定技巧的。 本文主要分享5种实用的Prompt对话提示框架，结合自己的实际需求，让你能够灵活使用大模型! 1.RTF框架RTF(Role-Task-Format)框架是一个非常简单通用的Prompt提示框架，我们和任意大模型对话场景下都可以使用该规范进行改进输出  **R-Role(">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用好大模型?这5种实用的Prompt框架你一定要看看">
+<meta property="og:url" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/index.html">
+<meta property="og:site_name" content="读书笔记">
+<meta property="og:description" content="用好大模型?这5种实用的Prompt框架你一定要看看!前言大模型正为我们带来前所未有的技术革新，而用好大模型也是有一定技巧的。 本文主要分享5种实用的Prompt对话提示框架，结合自己的实际需求，让你能够灵活使用大模型! 1.RTF框架RTF(Role-Task-Format)框架是一个非常简单通用的Prompt提示框架，我们和任意大模型对话场景下都可以使用该规范进行改进输出  **R-Role(">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-usecase1.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/image.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-step.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/use-prompt-risen.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/use-prompt-rodes.png">
+<meta property="og:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-chain-density.png">
+<meta property="article:published_time" content="2025-02-25T07:17:45.000Z">
+<meta property="article:modified_time" content="2025-03-02T08:58:31.716Z">
+<meta property="article:author" content="屹">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Prompt">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://yaoliyc.github.io/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-usecase1.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>用好大模型?这5种实用的Prompt框架你一定要看看 - 读书笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yaoliyc.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":"G-PT3RGBW5EN"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-PT3RGBW5EN", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-PT3RGBW5EN');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>读书笔记 </strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="用好大模型?这5种实用的Prompt框架你一定要看看"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-02-25 15:17" pubdate>
+          2025年2月25日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">用好大模型?这5种实用的Prompt框架你一定要看看</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="用好大模型-这5种实用的Prompt框架你一定要看看"><a href="#用好大模型-这5种实用的Prompt框架你一定要看看" class="headerlink" title="用好大模型?这5种实用的Prompt框架你一定要看看!"></a>用好大模型?这5种实用的Prompt框架你一定要看看!</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大模型正为我们带来前所未有的技术革新，而用好大模型也是有一定技巧的。</p>
+<p>本文主要分享<strong>5种</strong>实用的<code>Prompt</code>对话提示框架，结合自己的实际需求，让你能够灵活使用大模型!</p>
+<h2 id="1-RTF框架"><a href="#1-RTF框架" class="headerlink" title="1.RTF框架"></a>1.RTF框架</h2><p><strong>RTF(Role-Task-Format)框架</strong>是一个非常简单通用的Prompt提示框架，我们和任意大模型对话场景下都可以使用该规范进行改进输出</p>
+<ul>
+<li>**R-Role(角色)**：指定大模型担当固定角色(程序员、数据分析师、讲解员、记者等等)</li>
+<li><strong>T-Task(任务)</strong>: 任务，告诉大模型需要为我们做的事情</li>
+<li>**F-Format(格式)**：大模型最终结果的返回格式(比如：表格、Markdown、英文等等)</li>
+</ul>
+<p>主要优点：</p>
+<ul>
+<li>简单、方便</li>
+<li>指定Role角色，可以让大模型在当前的角色范围内回答知识，这在一些特定的领域中非常有效</li>
+<li>指定Role角色也能让工程上检索知识能够确定边界范围，配合元数据所发挥的威力会更强</li>
+<li>如果结合RAG知识内容检索，那么上下文回答的内容会让用户感觉更加是顺畅</li>
+</ul>
+<p><strong>示例1</strong>: <strong>给出一份Python语言的学习清单</strong></p>
+<blockquote>
+<p>Role：指定大模型角色为Python布道师</p>
+<p>Task：Python语言的学习从基础到进阶清单列表</p>
+<p>Format： 以表格的形式返回</p>
+</blockquote>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-usecase1.png" srcset="/img/loading.gif" lazyload alt="图1-实用RTF框架"></p>
+<p>在实际工作的任务中，我通过优化Prompt工程，对于我们的产品改善，对于回答的内容改善也非常明显！</p>
+<blockquote>
+<p>在我司给宁波天一阁开发的AI讲解产品中，我们提供和大模型对话的RAG产品，将天一阁的相关知识导入到系统，借助大模型进行讲解回答</p>
+</blockquote>
+<p>对比以下两个Prompt的区别：</p>
+<p>原Prompt：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs makefile">基于以下已知信息，简洁和专业的来回答天一阁相关的的问题。<br>如果无法从中得到答案，请说 <span class="hljs-string">&quot;根据已知信息无法回答该问题&quot;</span> 或 <span class="hljs-string">&quot;没有提供足够的相关信息&quot;</span>，不允许在答案中添加编造成分，答案请使用中文。<br><span class="hljs-section">问题:</span><br>&#123;&#125;<br><span class="hljs-section">已知内容:</span><br>&#123;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>改进后的Prompt：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs makefile">你是宁波天一阁的历史研究员，基于以下已知信息，简洁和专业的来回答天一阁相关的的问题。<br>如果无法从中得到答案，请根据根据实际回答，不要臆测内容，否则请说 <span class="hljs-string">&quot;根据已知信息无法回答该问题&quot;</span> 或 <span class="hljs-string">&quot;没有提供足够的相关信息&quot;</span>，不允许在答案中添加编造成分，答案请使用中文。<br><span class="hljs-section">问题:</span><br>&#123;&#125;<br><span class="hljs-section">已知内容:</span><br>&#123;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>改进后，大模型回答更加拟人化，如下图：</p>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/image.png" srcset="/img/loading.gif" lazyload alt="图2-优化后的大模型Prompt"></p>
+<h2 id="2-思考链模式"><a href="#2-思考链模式" class="headerlink" title="2.思考链模式"></a>2.思考链模式</h2><p>通过这种模式来逐步改善大模型的推理能力，非常<strong>适合一些复杂的任务处理</strong>。</p>
+<p>例如：</p>
+<ul>
+<li>分析型或者逻辑推理型的任务</li>
+<li>决策</li>
+<li>解决问题(比如程序员根据错误日志找Bug)</li>
+</ul>
+<p>而要使用这种模式，<strong>只需要在末尾添加”让我们逐步思考”即可</strong>。</p>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-step.png" srcset="/img/loading.gif" lazyload alt="图3-逐步推理模式应用"></p>
+<h2 id="3-RISEN框架"><a href="#3-RISEN框架" class="headerlink" title="3. RISEN框架"></a>3. RISEN框架</h2><ul>
+<li><strong>R-Role</strong>:大模型扮演的角色</li>
+<li><strong>I-Instructions</strong>: 指示命令，和<code>Task-任务</code>差不多</li>
+<li><strong>S-Steps</strong>: 步骤</li>
+<li><strong>E-End Goal</strong>: 最终目标</li>
+<li><strong>N-Narrowing(Constraints)</strong>: 缩小范围(约束条件)，和<code>RTF</code>框架中的<code>Format</code>有异曲同工之妙，一个是格式的约束，而这里的约束可以是任意方面，比如回答的内容(特定领域)、字数限制等等方面</li>
+</ul>
+<p>该框架主要适合：</p>
+<ul>
+<li>撰写具有特定约束的任务(例如博客文章)</li>
+<li>有明确指导方针的任务（例如商业计划）</li>
+</ul>
+<p>示例：</p>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/use-prompt-risen.png" srcset="/img/loading.gif" lazyload alt="图4-RISEN框架示例"></p>
+<h2 id="4-RODES框架"><a href="#4-RODES框架" class="headerlink" title="4.RODES框架"></a>4.RODES框架</h2><ul>
+<li>R-Role: 角色</li>
+<li>O - Objective: 目标</li>
+<li>D - Details: 详细的细节</li>
+<li>E - Examples: 示例</li>
+<li>S - Sense Check: 感官检查</li>
+</ul>
+<p>示例：</p>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/use-prompt-rodes.png" srcset="/img/loading.gif" lazyload alt="图5-RODES框架示例"></p>
+<h2 id="5-密度链模式"><a href="#5-密度链模式" class="headerlink" title="5.密度链模式"></a>5.密度链模式</h2><p>密度链模式<code>Prompt</code>是Salesforce、麻省理工学院和哥伦比亚大学的研究人员推出的一种新提示，它非常的高效,使用递归来创建越来越好的输出的提示，与普通提示生成的 GPT-4 摘要相比，它生成的摘要更加密集且更适合人们理解。</p>
+<blockquote>
+<p>这种模式在RAG工程中非常实用，想想看你的客户上传的文档知识库(PDF&#x2F;WORD)都是长篇的步骤性的文档,而在RAG召回送给大模型的Context上下文又受限于大模型的Token限制,为了更好的回答用户提问的问题，对于上传的知识库做密度链模式的摘要总结，然后索引整个文章内容召回是非常有必要的，最终能够非常精准的回答用户的问题。</p>
+</blockquote>
+<p>适合：</p>
+<ul>
+<li>总结</li>
+<li>改进您最喜欢的提示</li>
+<li>通过递归生成可用的长格式内容</li>
+</ul>
+<p>密度链模式的<code>Prompt</code>如下：</p>
+<p><img src="/2025/02/25/%E7%94%A8%E5%A5%BD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%995%E7%A7%8D%E5%AE%9E%E7%94%A8%E7%9A%84Prompt%E6%A1%86%E6%9E%B6%E4%BD%A0%E4%B8%80%E5%AE%9A%E8%A6%81%E7%9C%8B%E7%9C%8B!%20%E2%80%94%20%E5%85%AB%E4%B8%80%E8%8F%9C%E5%88%80/prompt-chain-density.png" srcset="/img/loading.gif" lazyload alt="图6-Chain of Density(Cod)prompt"></p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><br>文章: &#123;ARTICLE&#125;<br><br>您将为上述文章生成越来越简洁、实体密集的摘要。<br><br><br>重复以下2个步骤5次：<br><br><span class="hljs-bullet">- </span>步骤1:从文章中识别出先前生成的摘要中缺少的 1-3 个信息实体（以“;”分隔）。<br><span class="hljs-bullet">- </span>步骤2:写一个新的、长度相同的、更密集的摘要，其中涵盖先前摘要中的每个实体和细节以及缺失的内容实体。<br><br>缺少的实体是:<br><br><span class="hljs-bullet">- </span><span class="hljs-strong">**相关的:**</span>与主要故事相关，<br><span class="hljs-bullet">- </span><span class="hljs-strong">**具体的:**</span>描述具体而简洁（5个字或更少），<br><span class="hljs-bullet">- </span><span class="hljs-strong">**新颖的:**</span>不在之前的摘要中<br><span class="hljs-bullet">- </span><span class="hljs-strong">**务实的:**</span>存在于文章中<br><span class="hljs-bullet">- </span><span class="hljs-strong">**任何地方:**</span> 位于文章中的任何位置<br><br><span class="hljs-strong">**指南:**</span><br><br><span class="hljs-bullet">- </span>第一个摘要应该较长（4-5句，约80个词），但非常不具体，除了标记为缺失的实体外，几乎没有包含其他信息。使用过度冗长的语言和填充词（例如，“本文讨论”）以达到约80个词。<br><span class="hljs-bullet">- </span>让每个词都有意义：重新撰写前一个摘要以改善流畅性，并为额外的实体腾出空间。<br><span class="hljs-bullet">- </span>利用融合、压缩和删除诸如“文章讨论”的无信息短语，腾出空间。<br><span class="hljs-bullet">- </span>摘要应变得非常密集而简洁，但又是自包含的，例如，不需要阅读文章就能容易理解。<br><span class="hljs-bullet">- </span>缺失的实体可以出现在新摘要的任何位置。<br><span class="hljs-bullet">- </span>永远不要删除前一个摘要中的实体。如果无法腾出空间，就添加更少的新实体。<br><br>请记住，对于每个摘要都使用相同数量的词。<br><br>以JSON格式回答。JSON应该是一个字典列表（长度为5），其中键是“Missing_Entities”和“Denser_Summary”。<br><br></code></pre></td></tr></table></figure>
+
+<p>关于密度链模式的Prompt论文可以参考：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2309.04269.pdf">https://arxiv.org/pdf/2309.04269.pdf</a></p>
+<p>或者微信公众号回复”cod”获取文件</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><code>Prompt</code>对话提示框架在大模型领域中是非常重要的一环,不管你是在直接使用大模型，还是在做RAG领域的产品开发,<code>Prompt</code>的重要程度都是无可替代的。</p>
+<p>希望大家能根据本文列出的这5种<code>Prompt</code>框架进行举一反三，多多实践～</p>
+<p>对于<code>Prompt</code>工程技术细节，可以阅读员外的这两篇文章:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.luxiangdong.com/2023/08/08/prompt/">一文讲清楚实用Prompt工程</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.luxiangdong.com/2023/08/08/advprompt/">高级prompt工程讲解</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RAG/" class="category-chain-item">RAG</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/RAG/" class="print-no-link">#RAG</a>
+      
+        <a href="/tags/Prompt/" class="print-no-link">#Prompt</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>用好大模型?这5种实用的Prompt框架你一定要看看</div>
+      <div>http://yaoliyc.github.io/2025/02/25/用好大模型这5种实用的Prompt框架你一定要看看! — 八一菜刀/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>屹</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年2月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/03/02/Miniconda%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/" title="Miniconda的安装和使用">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Miniconda的安装和使用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/25/AI%E5%B7%A5%E7%A8%8B%E5%B8%88%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" title="AI工程师学习计划">
+                        <span class="hidden-mobile">AI工程师学习计划</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://sweet-faun-1bb615.netlify.app/.netlify/functions/twikoo","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
